@@ -41,10 +41,15 @@ export const motionControls = {
     description: "Loop goes 1 → last → 1. Ping-pong goes 1 → last → back to 1. Both start and end on frame 1.",
     options: [{ label: "Loop", value: "loop" }, { label: "Ping-pong", value: "pingpong" }],
   },
-  hold: {
-    ...live, type: "slider", target: "motion.hold", label: "Hold", defaultValue: d.hold,
-    min: 0, max: 90, step: 1, unit: "%", sliderValueKind: "continuous",
-    description: "Share of each step spent resting on a frame before morphing to the next. Timeline duration sets the overall speed.",
+  delay: {
+    ...live, type: "slider", target: "motion.delay", label: "Delay", defaultValue: d.delay,
+    min: 0, max: 3000, step: 50, unit: "ms", sliderValueKind: "continuous",
+    description: "How long each frame rests before morphing to the next.",
+  },
+  duration: {
+    ...live, type: "slider", target: "motion.duration", label: "Duration", defaultValue: d.duration,
+    min: 100, max: 6000, step: 50, unit: "ms", sliderValueKind: "continuous",
+    description: "How long each morph takes. The timeline length follows: steps × (delay + duration).",
   },
   easing: {
     ...live, type: "select", target: "motion.easing", label: "Easing", defaultValue: d.easing,

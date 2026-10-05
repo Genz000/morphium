@@ -77,7 +77,8 @@ const slider = (fractions: readonly number[]) => async (ctx: Ctx) => {
 const specs: Record<string, Spec> = {
   "frames.fit": { prove: cycleSegment },
   "motion.sequence": { prepare: (page) => pauseTimelineAt(page, 0.6), prove: cycleSegment },
-  "motion.hold": { prove: slider([0.85, 0.1, 0.5]) },
+  "motion.delay": { prove: slider([0.85, 0.1, 0.5]) },
+  "motion.duration": { prove: slider([0.8, 0.1, 0.5]) },
   "motion.easing": {
     prove: async (ctx) => {
       await (await field(ctx.page, ctx.target)).getByRole("combobox").click();

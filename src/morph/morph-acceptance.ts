@@ -13,7 +13,8 @@ const browser = (file: string, testName: string, budget: Budget = "standard") =>
 const referenceCoverage: Record<string, ToolcraftReferenceCoverage> = {
   "frames.fit": "renderer-state",
   "motion.sequence": "control-mapping",
-  "motion.hold": "control-mapping",
+  "motion.delay": "control-mapping",
+  "motion.duration": "control-mapping",
   "motion.easing": "control-mapping",
   "motion.curve": "control-mapping",
   "shape.outline": "control-mapping",

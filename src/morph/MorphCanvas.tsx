@@ -1,15 +1,16 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { getToolcraftTimelineLoopProgress } from "@/toolcraft/runtime";
 import {
   useToolcraftMediaPresentationUrls, useToolcraftPipelinePass, useToolcraftProductSceneFrame,
-  useToolcraftSelector, useToolcraftViewportInteractionActive,
+  useToolcraftDispatch, useToolcraftSelector, useToolcraftViewportInteractionActive,
 } from "@/toolcraft/runtime/react";
 
 import { decodeFrames, frameAssets, framesKey, isFrame, normalizedFrames, type FrameEntry } from "./morph-frames";
 import { decodePass, normalizePass, scenePass } from "./morph-pipeline";
 import { MorphOverlays } from "./MorphOverlays";
 import { readMorphSettings } from "./morph-settings";
+import { keyOrder } from "./morph-sequence";
 import { contrastInk, pathData, shapeAtProgress, stageMap } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
 import styles from "./morph.module.css";
@@ -39,6 +40,16 @@ export function MorphCanvas() {
   const decodedKey = decoded.status === "success" && ready ? key : "";
   const normalized = useToolcraftPipelinePass(normalizePass, { resources: decodedKey, fit: settings.fit }, () =>
     frames.length ? normalizedFrames(frames, decodedKey, settings.fit) : []);
+
+  // Delay and Duration own the speed: keep the timeline one full loop long.
+  const dispatch = useToolcraftDispatch();
+  const steps = Math.max(1, keyOrder(frames.length, settings.sequence).length - 1);
+  const loopSeconds = Math.min(60, Math.max(0.1, (steps * (settings.delay + settings.duration)) / 1000));
+  useEffect(() => {
+    if (frames.length > 1 && Math.abs(loopSeconds - durationSeconds) > 0.001) {
+      dispatch({ type: "timeline.setDuration", durationSeconds: loopSeconds } as never);
+    }
+  }, [dispatch, frames.length, loopSeconds, durationSeconds]);
 
   // Viewport pan/zoom holds the last drawn time instead of advancing playback work.
   const heldProgress = useRef(0);

@@ -8,7 +8,8 @@ export const MAX_FRAMES = 5;
 export const morphDefaults = {
   fit: "viewbox" as FitMode,
   sequence: "loop" as SequenceMode,
-  hold: 30,
+  delay: 500,
+  duration: 1200,
   easing: "cubic-in-out" as EasingChoice,
   curve: { activeChannel: "RGB" as const, points: { RGB: [{ x: 0, y: 0 }, { x: 0.35, y: 0.08 }, { x: 0.65, y: 0.92 }, { x: 1, y: 1 }] } },
   outline: false,
@@ -30,7 +31,7 @@ export const morphDefaults = {
 };
 
 export type MorphSettings = {
-  fit: FitMode; sequence: SequenceMode; hold: number; easing: string; curve: CurveValue;
+  fit: FitMode; sequence: SequenceMode; delay: number; duration: number; hold: number; easing: string; curve: CurveValue;
   outline: boolean; anchors: boolean; handles: boolean; labels: CoordinateLabels; decimals: number;
   labelSize: number; pointSize: number; anchorColor: string; handleColor: string; overlayExport: boolean;
   fillOn: boolean; fill: string; stroke: string; strokeWidth: number; lineJoin: LineJoin;
@@ -38,7 +39,7 @@ export type MorphSettings = {
 
 /** Targets that change frame geometry (normalisation) versus paint only. */
 export const geometryTargets = [FRAMES_TARGET, "frames.fit"] as const;
-export const motionTargets = ["motion.sequence", "motion.hold", "motion.easing", "motion.curve"] as const;
+export const motionTargets = ["motion.sequence", "motion.delay", "motion.duration", "motion.easing", "motion.curve"] as const;
 export const overlayTargets = [
   "overlay.anchors", "overlay.handles", "overlay.labels", "overlay.decimals",
   "overlay.labelSize", "overlay.pointSize", "overlay.anchorColor", "overlay.handleColor", "overlay.export",
@@ -51,7 +52,9 @@ export function readMorphSettings(values: Readonly<Record<string, unknown>>): Mo
   return {
     fit: v("frames.fit", d.fit),
     sequence: v("motion.sequence", d.sequence),
-    hold: v("motion.hold", d.hold),
+    delay: v("motion.delay", d.delay),
+    duration: v("motion.duration", d.duration),
+    hold: (100 * v("motion.delay", d.delay)) / Math.max(1, v("motion.delay", d.delay) + v("motion.duration", d.duration)),
     easing: v("motion.easing", d.easing),
     curve: v("motion.curve", d.curve),
     outline: v("shape.outline", d.outline),

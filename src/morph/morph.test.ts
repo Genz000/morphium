@@ -25,7 +25,8 @@ import { demoFrames, drawSignature, FRAME, MID_MORPH, recordingContext } from ".
 const changes: Record<string, { base?: Record<string, unknown>; value: unknown }> = {
   "frames.fit": { value: "content" },
   "motion.sequence": { value: "pingpong" },
-  "motion.hold": { value: 70 },
+  "motion.delay": { value: 1500 },
+  "motion.duration": { value: 400 },
   "motion.easing": { value: "linear" },
   "motion.curve": { base: { "motion.easing": "custom" }, value: { activeChannel: "RGB", points: { RGB: [{ x: 0, y: 0 }, { x: 0.5, y: 0.9 }, { x: 1, y: 1 }] } } },
   "shape.outline": { value: true },
@@ -70,7 +71,7 @@ async function primeCache(names: readonly string[]) {
 }
 
 async function exportSignature(values: Record<string, unknown>, timelineProgress: number, frame = FRAME) {
-  const state = toolcraftReducer(createToolcraftState(appSchema), { type: "controls.setValue", target: "motion.hold", value: values["motion.hold"] ?? 30 });
+  const state = toolcraftReducer(createToolcraftState(appSchema), { type: "controls.setValue", target: "motion.delay", value: values["motion.delay"] ?? 500 });
   const mediaAssets = ["circle", "star", "blob", "ring"].map((n) => asset(n));
   const { context, calls } = recordingContext();
   await morphExport.renderFrame({
@@ -139,7 +140,7 @@ const contractTests: Record<string, () => void | Promise<void>> = {
   },
   "persistence.reload": () => {
     expect(appSchema.persistence.storage).toBe("localStorage");
-    const values = { "motion.hold": 55, "shape.fill": "#123456", "overlay.labels": "both" };
+    const values = { "motion.delay": 900, "shape.fill": "#123456", "overlay.labels": "both" };
     expect(drawSignature(JSON.parse(JSON.stringify(values)))).toBe(drawSignature(values));
   },
 };
