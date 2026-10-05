@@ -37,7 +37,7 @@ export async function createToolcraftVideoEncoderBackend(
   request.signal.throwIfAborted();
   const mediabunny = await import("mediabunny");
   request.signal.throwIfAborted();
-  const codecs: readonly ToolcraftVideoCodec[] = ["avc", "vp9", "vp8"];
+  const codecs: readonly ToolcraftVideoCodec[] = ["avc", "vp9", "vp8", "hevc"];
   const supportResults = await Promise.all(
     codecs.map((codec) =>
       mediabunny.canEncodeVideo(codec, {
@@ -54,6 +54,7 @@ export async function createToolcraftVideoEncoderBackend(
     requestedFormat: request.requestedFormat,
     support: {
       avc: supportResults[0] === true,
+      hevc: supportResults[3] === true,
       vp8: supportResults[2] === true,
       vp9: supportResults[1] === true,
     },
@@ -61,7 +62,7 @@ export async function createToolcraftVideoEncoderBackend(
   });
   const format =
     policy.mediaType === "video/mp4"
-      ? new mediabunny.Mp4OutputFormat()
+      ? new mediabunny.Mp4OutputFormat({ fastStart: "in-memory" })
       : new mediabunny.WebMOutputFormat();
   const target = new mediabunny.BufferTarget();
   let overflowError: ToolcraftArtifactExportError | null = null;
@@ -77,7 +78,12 @@ export async function createToolcraftVideoEncoderBackend(
   let source: InstanceType<typeof mediabunny.CanvasSource>;
   try {
     source = new mediabunny.CanvasSource(request.canvas, {
-      bitrate: policy.bitrate,
+      // Constant quality (CRF-style quantizer) with the bitrate as fallback; no audio track is added.
+      quality: new mediabunny.Quality(
+        policy.quantizer === undefined
+          ? { bitrate: policy.bitrate }
+          : { bitrate: policy.bitrate, quantizer: policy.quantizer },
+      ),
       codec: policy.codec,
       keyFrameInterval: 2,
     });

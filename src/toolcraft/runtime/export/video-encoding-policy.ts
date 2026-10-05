@@ -3,17 +3,31 @@ import { ToolcraftArtifactExportError } from "./export-error";
 
 export const TOOLCRAFT_MAX_VIDEO_ARTIFACT_BYTES = 96 * 1024 * 1024;
 
-export type ToolcraftVideoCodec = "avc" | "vp8" | "vp9";
+export type ToolcraftVideoCodec = "avc" | "hevc" | "vp8" | "vp9";
 
 export type ToolcraftVideoEncodingSupport = Readonly<{
   avc: boolean;
+  hevc?: boolean;
   vp8: boolean;
   vp9: boolean;
 }>;
 
+/**
+ * Constant-quality targets (FFmpeg CRF equivalents) for web-optimized video:
+ * VP9 40 and H.265 32 give similar bitrates; H.264 28 is the matching level for
+ * browsers without H.265. VP8 has no quantizer mode and stays bitrate-driven.
+ */
+export const TOOLCRAFT_VIDEO_CONSTANT_QUALITY: Readonly<Partial<Record<ToolcraftVideoCodec, number>>> = Object.freeze({
+  avc: 28,
+  hevc: 32,
+  vp9: 40,
+});
+
 export type ToolcraftVideoEncodingPolicy = Readonly<{
+  /** Fallback when the browser encoder cannot run in constant-quality mode. */
   bitrate: number;
   codec: ToolcraftVideoCodec;
+  quantizer?: number;
   extension: ".mp4" | ".webm";
   mediaType: "video/mp4" | "video/webm";
 }>;
@@ -24,11 +38,11 @@ type ToolcraftVideoEncodingCandidate = Readonly<{
   mediaType: "video/mp4" | "video/webm";
 }>;
 
-const mp4Candidate: ToolcraftVideoEncodingCandidate = Object.freeze({
-  codec: "avc",
-  extension: ".mp4",
-  mediaType: "video/mp4",
-});
+// MP4 prefers H.265 (written as hvc1 for Apple devices) and falls back to H.264.
+const mp4Candidates: readonly ToolcraftVideoEncodingCandidate[] = Object.freeze([
+  Object.freeze({ codec: "hevc", extension: ".mp4", mediaType: "video/mp4" }),
+  Object.freeze({ codec: "avc", extension: ".mp4", mediaType: "video/mp4" }),
+]);
 const webmCandidates: readonly ToolcraftVideoEncodingCandidate[] = Object.freeze([
   Object.freeze({ codec: "vp9", extension: ".webm", mediaType: "video/webm" }),
   Object.freeze({ codec: "vp8", extension: ".webm", mediaType: "video/webm" }),
@@ -71,9 +85,9 @@ export function resolveToolcraftVideoEncodingPolicy({
   assertArtifactBudget(bitrate, durationSeconds);
   const candidates =
     requestedFormat === "mp4"
-      ? [mp4Candidate, ...webmCandidates]
-      : [...webmCandidates, mp4Candidate];
-  const candidate = candidates.find((item) => support[item.codec]);
+      ? [...mp4Candidates, ...webmCandidates]
+      : [...webmCandidates, ...mp4Candidates];
+  const candidate = candidates.find((item) => support[item.codec] === true);
 
   if (!candidate) {
     throw new ToolcraftArtifactExportError({
@@ -82,5 +96,6 @@ export function resolveToolcraftVideoEncodingPolicy({
     });
   }
 
-  return Object.freeze({ ...candidate, bitrate });
+  const quantizer = TOOLCRAFT_VIDEO_CONSTANT_QUALITY[candidate.codec];
+  return Object.freeze({ ...candidate, bitrate, ...(quantizer === undefined ? {} : { quantizer }) });
 }

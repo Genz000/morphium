@@ -11,7 +11,7 @@ Animate between SVG shapes. Upload up to five SVG frames and Morphium morphs one
 - Outline view, fill and stroke colour, stroke width and line join
 - Anchors and bézier handles on or off, with x, y coordinates in the first frame's SVG units
 - Background colour, editable canvas size
-- Export PNG/JPG (2K, 4K, 8K) and MP4/WebM video of one full loop
+- Export PNG/JPG (2K, 4K, 8K) and web-optimized video of one full loop: MP4 as H.265 (hvc1, faststart; H.264 where the browser cannot encode H.265) and WebM as VP9, both at constant quality with no audio track
 
 ## How to use
 
