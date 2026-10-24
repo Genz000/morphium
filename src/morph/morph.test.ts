@@ -57,13 +57,17 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
 for (const row of appAcceptance.filter((r) => r.automatedTestName.startsWith("morph parameter"))) {
   it(row.automatedTestName, async () => {
     if (row.target === "overlay.exportDots") {
-      // Dots are drawn by the export renderer only, when Workspace is Dots.
+      // With Background off, exports draw the editor workspace (and its dots) like the preview.
       await primeCache(["circle", "star", "blob", "ring"]);
-      const dots = { "canvas.workspaceBackground": "dots" };
-      expect(await exportSignature({ ...dots, "overlay.exportDots": true }, MID_MORPH))
-        .not.toBe(await exportSignature({ ...dots, "overlay.exportDots": false }, MID_MORPH));
-      expect(await exportSignature({ "canvas.workspaceBackground": "blanc", "overlay.exportDots": true }, MID_MORPH))
-        .toBe(await exportSignature({ ...dots, "overlay.exportDots": false }, MID_MORPH));
+      const off = { "export.includeBackground": false, "canvas.workspaceBackground": "dots" };
+      const withWorkspace = await exportSignature({ ...off, "overlay.exportDots": true }, MID_MORPH);
+      expect(withWorkspace).not.toBe(await exportSignature({ ...off, "overlay.exportDots": false }, MID_MORPH));
+      expect(withWorkspace).toContain("\"arc\"");
+      // Blanc workspace: fill only, no dots.
+      expect(await exportSignature({ ...off, "canvas.workspaceBackground": "blanc", "overlay.exportDots": true }, MID_MORPH)).not.toBe(withWorkspace);
+      // Background on: the plain background colour, exactly as before.
+      expect(await exportSignature({ "canvas.workspaceBackground": "dots", "overlay.exportDots": true }, MID_MORPH))
+        .toBe(await exportSignature({ "canvas.workspaceBackground": "dots", "overlay.exportDots": false }, MID_MORPH));
       return;
     }
     const change = changes[row.target!];

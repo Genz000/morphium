@@ -196,7 +196,8 @@ test("browser: morph parameter overlay.exportDots", async ({ page }) => {
   const session = await openMorph(page);
   await selectOption(page, "export.image.resolution", "2K");
   await selectOption(page, "canvas.workspaceBackground", "Dots");
-  const background = [244, 241, 234, 255] as const;
+  await setSwitch(page, "export.includeBackground", false);
+  const background = [0, 0, 0, 0] as const;
   await setSwitch(page, "overlay.exportDots", false);
   const plain = (await inspectToolcraftImageDownload({ page, download: await downloadImage(page), backgroundRgba: background })).inspection;
   await setSwitch(page, "overlay.exportDots", true);

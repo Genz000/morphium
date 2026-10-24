@@ -10,6 +10,7 @@ import { decodeFrames, frameAssets, framesKey, isFrame, normalizedFrames, type F
 import { decodePass, normalizePass, scenePass } from "./morph-pipeline";
 import { MorphOverlays } from "./MorphOverlays";
 import { readMorphSettings } from "./morph-settings";
+import { backdropColor } from "./morph-workspace";
 import { loopMs } from "./morph-sequence";
 import { baseStyle, contrastInk, lastFrameStyle, lastFrameWeight, overlayOpacity, pathData, shapeAtProgress, stageMap, type PaintStyle } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
@@ -25,7 +26,8 @@ export function MorphCanvas() {
   const durationSeconds = useToolcraftSelector((state) => state.timeline.durationSeconds);
   const viewportActive = useToolcraftViewportInteractionActive();
   const settings = useMemo(() => readMorphSettings(values), [values]);
-  const background = String(values["appearance.background"] ?? "#F4F1EA");
+  // Outline ink contrasts with what is visible behind the shape (workspace when Background is off).
+  const background = backdropColor(values);
   const assets = useMemo(() => frameAssets(media), [media]);
   const urls = useToolcraftMediaPresentationUrls(media);
   const ready = assets.every((asset) => urls.has(asset.id));

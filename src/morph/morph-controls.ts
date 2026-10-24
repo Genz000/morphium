@@ -128,8 +128,8 @@ export const displayControls = {
     description: "Includes anchors, handles and coordinates in PNG, JPG and video exports.",
   },
   exportDots: {
-    ...live, type: "switch", target: "overlay.exportDots", label: "Dots in export", defaultValue: d.exportDots,
-    description: "When Workspace (in Settings) is Dots, draws the same dot grid behind the shape in PNG, JPG and video exports.",
+    ...live, type: "switch", target: "overlay.exportDots", label: "Workspace in export", defaultValue: d.exportDots,
+    description: "With Background off (in Settings), PNG, JPG and video use the same workspace you see in the preview, including its dots when Workspace is Dots, instead of the background colour.",
   },
 } as const satisfies Record<string, ToolcraftControlSchema>;
 

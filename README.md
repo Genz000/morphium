@@ -12,7 +12,7 @@ Animate between SVG shapes. Upload up to five SVG frames and Morphium morphs one
 - A separate look for the last frame (solid fill or outline), with the option to hide its anchors and handles and to hold it longer (Last frame hold, in ms)
 - Anchors and bézier handles on or off, with x, y coordinates in the first frame's SVG units
 - Background colour, editable canvas size
-- Export PNG/JPG (2K, 4K, 8K) and web-optimized video of one full loop: MP4 as H.265 (hvc1, faststart; H.264 where the browser cannot encode H.265) and WebM as VP9, both at constant quality with no audio track; the workspace dot grid can be included
+- Export PNG/JPG (2K, 4K, 8K) and web-optimized video of one full loop: MP4 as H.265 (hvc1, faststart; H.264 where the browser cannot encode H.265) and WebM as VP9, both at constant quality with no audio track; with Background off, exports can use the same dotted workspace you see in the preview
 
 ## How to use
 
