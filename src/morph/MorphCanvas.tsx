@@ -11,7 +11,7 @@ import { decodePass, normalizePass, scenePass } from "./morph-pipeline";
 import { MorphOverlays } from "./MorphOverlays";
 import { readMorphSettings } from "./morph-settings";
 import { keyOrder } from "./morph-sequence";
-import { baseStyle, contrastInk, lastFrameStyle, lastFrameWeight, pathData, shapeAtProgress, stageMap, type PaintStyle } from "./morph-scene";
+import { baseStyle, contrastInk, lastFrameStyle, lastFrameWeight, overlayOpacity, pathData, shapeAtProgress, stageMap, type PaintStyle } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
 import styles from "./morph.module.css";
 
@@ -70,6 +70,7 @@ export function MorphCanvas() {
   const d = pathData(shape);
   const last = lastFrameStyle(settings);
   const lastWeight = last ? lastFrameWeight(phase, norm.length) : 0;
+  const overlay = overlayOpacity(settings, lastWeight);
   const paintProps = (style: PaintStyle) => style.outline
     ? { fill: "none", stroke: contrastInk(background), strokeWidth: ui / map!.s }
     : {
@@ -99,7 +100,7 @@ export function MorphCanvas() {
           {last ? <path data-testid="morph-shape-last" d={d} opacity={lastWeight} {...paintProps(last)} /> : null}
         </g>
       ) : null}
-      {map ? <MorphOverlays shape={shape} map={map} settings={settings} ui={ui} /> : null}
+      {map ? <MorphOverlays shape={shape} map={map} settings={settings} ui={ui} anchorOpacity={overlay.anchors} handleOpacity={overlay.handles} /> : null}
     </svg>
   );
 }

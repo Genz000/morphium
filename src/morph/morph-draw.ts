@@ -1,6 +1,6 @@
 import type { MorphSettings } from "./morph-settings";
 import {
-  baseStyle, contrastInk, formatCoordinate, lastFrameStyle, type PaintStyle, overlayGeometry, showsAnchorLabels, showsHandleLabels, type StageMap,
+  baseStyle, contrastInk, formatCoordinate, lastFrameStyle, overlayOpacity, type PaintStyle, overlayGeometry, showsAnchorLabels, showsHandleLabels, type StageMap,
 } from "./morph-scene";
 import type { Subpath } from "./morph-types";
 
@@ -34,7 +34,7 @@ export function drawMorphFrame(
   if (weight < 1) paint(ctx, path, baseStyle(settings), 1 - weight, background, ui / map.s);
   if (last && weight > 0) paint(ctx, path, last, weight, background, ui / map.s);
   ctx.restore();
-  if (includeOverlays) drawOverlays(ctx, shape, map, settings, ui);
+  if (includeOverlays) drawOverlays(ctx, shape, map, settings, ui, overlayOpacity(settings, weight));
 }
 
 function paint(ctx: CanvasRenderingContext2D, path: Path2D, style: PaintStyle, alpha: number, background: string, hairline: number) {
@@ -50,22 +50,26 @@ function paint(ctx: CanvasRenderingContext2D, path: Path2D, style: PaintStyle, a
   ctx.globalAlpha = 1;
 }
 
-function drawOverlays(ctx: CanvasRenderingContext2D, shape: readonly Subpath[], map: StageMap, settings: MorphSettings, ui: number) {
+function drawOverlays(
+  ctx: CanvasRenderingContext2D, shape: readonly Subpath[], map: StageMap, settings: MorphSettings, ui: number,
+  opacity: { anchors: number; handles: number },
+) {
   const X = (x: number) => x * map.s + map.ox, Y = (y: number) => y * map.s + map.oy;
   const { anchors, handles } = overlayGeometry(shape, 0.5 / map.s);
   const ps = settings.pointSize * ui;
   ctx.save();
-  if (settings.handles) {
-    ctx.strokeStyle = settings.handleColor; ctx.globalAlpha = 0.75; ctx.lineWidth = ui;
+  if (settings.handles && opacity.handles > 0) {
+    ctx.strokeStyle = settings.handleColor; ctx.globalAlpha = 0.75 * opacity.handles; ctx.lineWidth = ui;
     ctx.beginPath();
     for (const h of handles) { ctx.moveTo(X(h[0]), Y(h[1])); ctx.lineTo(X(h[2]), Y(h[3])); }
     ctx.stroke();
-    ctx.globalAlpha = 1; ctx.fillStyle = settings.handleColor;
+    ctx.globalAlpha = opacity.handles; ctx.fillStyle = settings.handleColor;
     ctx.beginPath();
     for (const h of handles) { ctx.moveTo(X(h[2]) + ps * 0.75, Y(h[3])); ctx.arc(X(h[2]), Y(h[3]), ps * 0.75, 0, 2 * Math.PI); }
     ctx.fill();
   }
-  if (settings.anchors) {
+  if (settings.anchors && opacity.anchors > 0) {
+    ctx.globalAlpha = opacity.anchors;
     ctx.fillStyle = "#FFFFFF"; ctx.strokeStyle = settings.anchorColor; ctx.lineWidth = 1.5 * ui;
     for (const [ax, ay] of anchors) {
       ctx.fillRect(X(ax) - ps, Y(ay) - ps, ps * 2, ps * 2);
@@ -83,7 +87,10 @@ function drawOverlays(ctx: CanvasRenderingContext2D, shape: readonly Subpath[], 
     ctx.beginPath(); ctx.roundRect(lx, ly - h / 2, w + padX * 2, h, 3 * ui); ctx.fill();
     ctx.fillStyle = color; ctx.fillText(text, lx + padX, ly + 0.5 * ui);
   };
-  if (showsHandleLabels(settings)) for (const h of handles) label(h[2], h[3], settings.handleColor);
-  if (showsAnchorLabels(settings)) for (const [ax, ay] of anchors) label(ax, ay, "#FFFFFF");
+  ctx.globalAlpha = opacity.handles;
+  if (showsHandleLabels(settings) && opacity.handles > 0) for (const h of handles) label(h[2], h[3], settings.handleColor);
+  ctx.globalAlpha = opacity.anchors;
+  if (showsAnchorLabels(settings) && opacity.anchors > 0) for (const [ax, ay] of anchors) label(ax, ay, "#FFFFFF");
+  ctx.globalAlpha = 1;
   ctx.restore();
 }

@@ -108,3 +108,12 @@ export function lastFrameWeight(phase: MorphPhase, frameCount: number): number {
   const p = Math.min(Math.max(phase.p, 0), 1);
   return (phase.a === last ? 1 - p : 0) + (phase.b === last ? p : 0);
 }
+
+/**
+ * Overlay visibility (0..1) for anchors and handles. Hiding them on the last
+ * frame fades them out by the same weight as the last-frame style.
+ */
+export function overlayOpacity(s: MorphSettings, lastWeight: number): { anchors: number; handles: number } {
+  const w = s.lastOn ? lastWeight : 0;
+  return { anchors: s.lastAnchors ? 1 : 1 - w, handles: s.lastHandles ? 1 : 1 - w };
+}

@@ -129,6 +129,8 @@ const specs: Record<string, Spec> = {
   "lastFrame.on": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: toggle },
   "lastFrame.style": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: cycleSegment },
   "lastFrame.fill": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: color(["#2F5BFF", "#22AA66", "#AA1144"]) },
+  "lastFrame.anchors": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: toggle },
+  "lastFrame.handles": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: toggle },
   "overlay.anchors": { prove: toggle },
   "overlay.anchorColor": { prove: color(["#AA00FF", "#00CCAA"]) },
   "overlay.handles": { prove: toggle },

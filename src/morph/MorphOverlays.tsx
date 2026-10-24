@@ -6,10 +6,10 @@ import {
 } from "./morph-scene";
 import type { Subpath } from "./morph-types";
 
-type Props = { shape: readonly Subpath[]; map: StageMap; settings: MorphSettings; ui: number };
+type Props = { shape: readonly Subpath[]; map: StageMap; settings: MorphSettings; ui: number; anchorOpacity?: number; handleOpacity?: number };
 
 /** Anchors, bézier handles and coordinate labels drawn over the shape, in scene pixels. */
-export const MorphOverlays = memo(function MorphOverlays({ shape, map, settings, ui }: Props) {
+export const MorphOverlays = memo(function MorphOverlays({ shape, map, settings, ui, anchorOpacity = 1, handleOpacity = 1 }: Props) {
   const X = (x: number) => x * map.s + map.ox, Y = (y: number) => y * map.s + map.oy;
   const { anchors, handles } = overlayGeometry(shape, 0.5 / map.s);
   const ps = settings.pointSize * ui;
@@ -30,8 +30,8 @@ export const MorphOverlays = memo(function MorphOverlays({ shape, map, settings,
   };
   return (
     <g data-testid="morph-overlays">
-      {settings.handles ? (
-        <g data-testid="morph-handles">
+      {settings.handles && handleOpacity > 0 ? (
+        <g data-testid="morph-handles" opacity={handleOpacity}>
           <path
             d={handles.map((h) => `M${X(h[0])} ${Y(h[1])}L${X(h[2])} ${Y(h[3])}`).join("")}
             stroke={settings.handleColor} strokeOpacity={0.75} strokeWidth={ui} fill="none"
@@ -39,8 +39,8 @@ export const MorphOverlays = memo(function MorphOverlays({ shape, map, settings,
           {handles.map((h, i) => <circle key={i} cx={X(h[2])} cy={Y(h[3])} r={ps * 0.75} fill={settings.handleColor} />)}
         </g>
       ) : null}
-      {settings.anchors ? (
-        <g data-testid="morph-anchors">
+      {settings.anchors && anchorOpacity > 0 ? (
+        <g data-testid="morph-anchors" opacity={anchorOpacity}>
           {anchors.map(([ax, ay], i) => (
             <rect
               key={i} x={X(ax) - ps} y={Y(ay) - ps} width={ps * 2} height={ps * 2}
@@ -49,11 +49,11 @@ export const MorphOverlays = memo(function MorphOverlays({ shape, map, settings,
           ))}
         </g>
       ) : null}
-      {showsHandleLabels(settings) ? (
-        <g data-testid="morph-handle-labels">{handles.map((h, i) => label(h[2], h[3], settings.handleColor, `h${i}`))}</g>
+      {showsHandleLabels(settings) && handleOpacity > 0 ? (
+        <g data-testid="morph-handle-labels" opacity={handleOpacity}>{handles.map((h, i) => label(h[2], h[3], settings.handleColor, `h${i}`))}</g>
       ) : null}
-      {showsAnchorLabels(settings) ? (
-        <g data-testid="morph-anchor-labels">{anchors.map(([ax, ay], i) => label(ax, ay, "#FFFFFF", `a${i}`))}</g>
+      {showsAnchorLabels(settings) && anchorOpacity > 0 ? (
+        <g data-testid="morph-anchor-labels" opacity={anchorOpacity}>{anchors.map(([ax, ay], i) => label(ax, ay, "#FFFFFF", `a${i}`))}</g>
       ) : null}
     </g>
   );

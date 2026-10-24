@@ -49,6 +49,8 @@ export const morphSectionInventory = [
     finiteSelectors: [
       { target: "lastFrame.on", role: "branch", affectedTargets: [], reason: "Look and colour apply only while the last frame has its own style." },
       { target: "lastFrame.style", role: "branch", affectedTargets: [], reason: "The colour applies only to the Fill look." },
+      { target: "lastFrame.anchors", role: "parameter", reason: "Hides anchor points on the last frame only." },
+      { target: "lastFrame.handles", role: "parameter", reason: "Hides handle lines and points on the last frame only." },
     ],
   },
   {

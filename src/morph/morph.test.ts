@@ -28,6 +28,8 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
   "lastFrame.on": { value: true, progress: ON_LAST },
   "lastFrame.style": { base: { "lastFrame.on": true }, value: "outline", progress: ON_LAST },
   "lastFrame.fill": { base: { "lastFrame.on": true }, value: "#2F5BFF", progress: ON_LAST },
+  "lastFrame.anchors": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
+  "lastFrame.handles": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
   "frames.fit": { value: "content" },
   "motion.sequence": { value: "pingpong" },
   "motion.delay": { value: 1500 },
@@ -176,6 +178,11 @@ describe("last frame style", () => {
     const into = lastFrameWeight(phaseAt(0.7, 4, "loop", 30, ease), 4);
     expect(into).toBeGreaterThan(0); expect(into).toBeLessThan(1);
     expect(lastFrameWeight(phaseAt(0.95, 4, "loop", 30, ease), 4)).toBeLessThan(1);
+  });
+  it("hides anchors and handles on the last frame only", () => {
+    const hidden = { "lastFrame.on": true, "lastFrame.anchors": false, "lastFrame.handles": false };
+    expect(drawSignature(hidden, { progress: MID_MORPH })).toBe(drawSignature({ "lastFrame.on": true }, { progress: MID_MORPH }));
+    expect(drawSignature(hidden, { progress: 0.78 })).not.toBe(drawSignature({ "lastFrame.on": true }, { progress: 0.78 }));
   });
   it("leaves every other frame untouched", () => {
     expect(drawSignature({ "lastFrame.on": true, "shape.outline": true }, { progress: MID_MORPH }))

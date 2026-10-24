@@ -143,4 +143,12 @@ export const lastFrameControls = {
     applicability: { mode: "conditional", all: [{ target: "lastFrame.on", equals: true }, { target: "lastFrame.style", equals: "fill" }] },
     type: "color", target: "lastFrame.fill", label: "Last frame color", defaultValue: d.lastFill,
   },
+  anchors: {
+    ...live, ...when("lastFrame.on", { equals: true }), type: "switch", target: "lastFrame.anchors", label: "Anchors",
+    defaultValue: d.lastAnchors, description: "Turn off to hide the anchor points (and their coordinates) on the last frame only.",
+  },
+  handles: {
+    ...live, ...when("lastFrame.on", { equals: true }), type: "switch", target: "lastFrame.handles", label: "Handles",
+    defaultValue: d.lastHandles, description: "Turn off to hide the handle lines and points (and their coordinates) on the last frame only.",
+  },
 } as const satisfies Record<string, ToolcraftControlSchema>;
