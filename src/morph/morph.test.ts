@@ -66,6 +66,9 @@ for (const row of appAcceptance.filter((r) => r.automatedTestName.startsWith("mo
       expect(withWorkspace).toContain("\"arc\"");
       // Blanc workspace: fill only, no dots.
       expect(await exportSignature({ ...off, "canvas.workspaceBackground": "blanc", "overlay.exportDots": true }, MID_MORPH)).not.toBe(withWorkspace);
+      // The dot grid scales with the artwork Scale.
+      expect(await exportSignature({ ...off, "overlay.exportDots": true, "frames.scale": 200 }, MID_MORPH))
+        .not.toBe(await exportSignature({ ...off, "overlay.exportDots": true, "frames.scale": 200, "canvas.workspaceBackground": "blanc" }, MID_MORPH));
       // Background on: the plain background colour, exactly as before.
       expect(await exportSignature({ "canvas.workspaceBackground": "dots", "overlay.exportDots": true }, MID_MORPH))
         .toBe(await exportSignature({ "canvas.workspaceBackground": "dots", "overlay.exportDots": false }, MID_MORPH));
@@ -305,5 +308,20 @@ describe("morph engine (ported from the original page)", () => {
     expect(frame.subs[0].segs[0].slice(0, 2)).toEqual([10, 10]);
     expect(Math.max(...frame.subs[2].segs.map((g) => g[0]))).toBeCloseTo(165);
     expect(() => parseSvgFrame("<html></html>", "x.svg")).toThrow(/not a valid SVG/);
+  });
+});
+
+describe("workspace dots follow Scale", () => {
+  it("doubles spacing and dot size at 200%", async () => {
+    const { drawWorkspace } = await import("./morph-draw");
+    const arcs = (scale: number) => {
+      const { context, calls } = recordingContext();
+      drawWorkspace(context, { x: -960, y: -540, width: 1920, height: 1080 }, { background: "#0A0A0A", dots: "#F5F5F5" }, true, scale);
+      return calls.filter((c) => (c as unknown[])[0] === "arc") as unknown[][];
+    };
+    const one = arcs(1), two = arcs(2);
+    expect(two.length).toBeLessThan(one.length / 3);
+    expect(two[0][3]).toBe(3.5);
+    expect(Math.abs((two[1][1] as number) - (two[0][1] as number))).toBe(48);
   });
 });

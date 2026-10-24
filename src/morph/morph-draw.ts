@@ -102,22 +102,25 @@ function drawOverlays(
  */
 export function drawWorkspace(
   ctx: CanvasRenderingContext2D, frame: { x: number; y: number; width: number; height: number },
-  workspace: { background: string; dots: string }, dots: boolean,
+  workspace: { background: string; dots: string }, dots: boolean, scale = 1,
 ) {
   ctx.save();
   ctx.fillStyle = workspace.background;
   ctx.fillRect(frame.x, frame.y, frame.width, frame.height);
   ctx.restore();
-  if (dots) drawWorkspaceDots(ctx, frame, workspace.dots);
+  if (dots) drawWorkspaceDots(ctx, frame, workspace.dots, scale);
 }
 
 export const EXPORT_DOT_OPACITY = 0.22;
 
-function drawWorkspaceDots(ctx: CanvasRenderingContext2D, frame: { x: number; y: number; width: number; height: number }, dotColor: string) {
+function drawWorkspaceDots(ctx: CanvasRenderingContext2D, frame: { x: number; y: number; width: number; height: number }, dotColor: string, scale: number) {
   // Same grid as the editor (24 px, anchored like the canvas). Dots are drawn a little larger and
   // stronger than the on-screen 10% so they survive video compression and players that crush
   // the darkest tones; at 10% they vanished in H.265 MP4 playback.
-  const gap = 24, radius = 1.75, phase = 11.5;
+  // Spacing, dot size and anchor scale with the artwork Scale, around the scene origin.
+  const k = scale > 0 ? scale : 1;
+  // Editor dot centres sit at n·gap − (gap/2 + 1 − 1.5k); keep the same anchor.
+  const gap = 24 * k, radius = 1.75 * k, phase = 10.5 * k + 1;
   const startX = Math.ceil((frame.x + phase) / gap) * gap - phase;
   const startY = Math.ceil((frame.y + phase) / gap) * gap - phase;
   ctx.save();

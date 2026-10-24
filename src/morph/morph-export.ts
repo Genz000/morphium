@@ -28,7 +28,7 @@ export const morphExport: ToolcraftProductExportRenderer = {
       // Background off shows the editor workspace in the preview; export the same backdrop.
       const workspace = workspaceColors();
       const showWorkspace = settings.exportDots && state.values["export.includeBackground"] === false;
-      if (showWorkspace) drawWorkspace(context, frame, workspace, state.values["canvas.workspaceBackground"] === "dots");
+      if (showWorkspace) drawWorkspace(context, frame, workspace, state.values["canvas.workspaceBackground"] === "dots", settings.scale / 100);
       const background = showWorkspace ? workspace.background : String(state.values["appearance.background"] ?? "#F4F1EA");
       drawMorphFrame(context, shape, map, settings, background, ui, settings.overlayExport, lastFrameWeight(phase, norm.length));
       signal.throwIfAborted();
