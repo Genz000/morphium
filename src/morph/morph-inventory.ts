@@ -62,6 +62,7 @@ export const morphSectionInventory = [
       { target: "overlay.labels", role: "branch", affectedTargets: [], reason: "Decimals and label size apply only while coordinates are shown." },
       { target: "overlay.decimals", role: "parameter", reason: "Changes label precision only." },
       { target: "overlay.export", role: "parameter", reason: "Adds overlays to exported files; preview is unchanged." },
+      { target: "overlay.exportDots", role: "parameter", reason: "Adds the workspace dot grid to exported files; preview is unchanged." },
     ],
   },
   {

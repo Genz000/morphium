@@ -36,7 +36,7 @@ const controlRows: Row[] = productControls.map((control) => {
     id: target, target, kind: "control", componentType: control.type, interactionId: `${target}-property`,
     automated: true, automatedTestName: `morph parameter ${target}`,
     browser: browser("product-morph-controls", `browser: morph parameter ${target}`),
-    evidence: target === "overlay.export" ? "exported-bytes" : "product-output",
+    evidence: target === "overlay.export" || target === "overlay.exportDots" ? "exported-bytes" : "product-output",
     fixture: "Default demo frames, playback paused on a mid-morph time so overlays and shape are both visible.",
     userAction: `Change ${control.label} through the real control.`,
     expectedObservable: "The rendered morph preview changes according to the setting.",

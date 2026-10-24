@@ -55,7 +55,17 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
 };
 
 for (const row of appAcceptance.filter((r) => r.automatedTestName.startsWith("morph parameter"))) {
-  it(row.automatedTestName, () => {
+  it(row.automatedTestName, async () => {
+    if (row.target === "overlay.exportDots") {
+      // Dots are drawn by the export renderer only, when Workspace is Dots.
+      await primeCache(["circle", "star", "blob", "ring"]);
+      const dots = { "canvas.workspaceBackground": "dots" };
+      expect(await exportSignature({ ...dots, "overlay.exportDots": true }, MID_MORPH))
+        .not.toBe(await exportSignature({ ...dots, "overlay.exportDots": false }, MID_MORPH));
+      expect(await exportSignature({ "canvas.workspaceBackground": "blanc", "overlay.exportDots": true }, MID_MORPH))
+        .toBe(await exportSignature({ ...dots, "overlay.exportDots": false }, MID_MORPH));
+      return;
+    }
     const change = changes[row.target!];
     expect(change, `fixture for ${row.target}`).toBeDefined();
     const base = change.base ?? {};
@@ -189,6 +199,16 @@ describe("last frame hold", () => {
     for (const p of [0.1, 0.3, 0.55, 0.78, 0.9]) {
       expect(phaseAt(p, 4, "loop", 0, ease, { delay: 500, duration: 1200, lastHold: 0 }).a).toBe(phaseAt(p, 4, "loop", 500 / 17, ease).a);
     }
+  });
+  it("Once runs 1 → last and ends resting on the last frame", () => {
+    const t = { delay: 500, duration: 1200, lastHold: 2000 };
+    expect(keyOrder(4, "once")).toEqual([0, 1, 2, 3]);
+    expect(loopMs(4, "once", t)).toBe(3 * 1700 + 2500);
+    const ease = resolveEasing("linear", undefined);
+    expect(phaseAt(0, 4, "once", 0, ease, t)).toMatchObject({ a: 0, holding: true });
+    expect(phaseAt(1, 4, "once", 0, ease, t)).toMatchObject({ a: 3, b: 3, holding: true });
+    expect(phaseAt(5200 / 7600, 4, "once", 0, ease, t)).toMatchObject({ a: 3, holding: true });
+    expect(drawSignature({ "motion.sequence": "once" }, { progress: 1 })).not.toBe(drawSignature({}, { progress: 1 }));
   });
   it("holds the middle frame in ping-pong", () => {
     expect(stepHolds(4, "pingpong", timing)).toEqual([500, 500, 500, 3500, 500, 500]);

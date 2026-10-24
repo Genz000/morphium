@@ -3,10 +3,11 @@ import { expectToolcraftInfinityCanvasVideoExportEvidence } from "./browser-infi
 import { expectToolcraftVideoExportArtifact } from "./browser-media-export-evidence";
 import { expect, test } from "./toolcraft-product-test";
 import { BACKGROUND_RGBA, oneSecondSchedule, videoSamples } from "./morph-export-fixtures";
-import { downloadVideo, editDuration, openMorph, selectOption } from "./morph-test-helpers";
+import { downloadVideo, editDuration, openMorph, selectOption, setSwitch } from "./morph-test-helpers";
 
 test("browser: morph video export delivers formats and sizes", async ({ page }) => {
   const session = await openMorph(page, { pauseAt: 0 });
+  await setSwitch(page, "overlay.exportDots", false);
   await editDuration(page, 1);
   await expect(page.getByRole("slider", { name: "Playback position" })).toHaveAttribute("aria-valuemax", "1");
   const infinity = page.getByRole("switch", { name: "Infinity canvas", exact: true });

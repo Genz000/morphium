@@ -191,3 +191,18 @@ test("browser: morph parameter overlay.export", async ({ page }) => {
     return inspected;
   }, { requirementId: "overlay.export" });
 });
+
+test("browser: morph parameter overlay.exportDots", async ({ page }) => {
+  const session = await openMorph(page);
+  await selectOption(page, "export.image.resolution", "2K");
+  await selectOption(page, "canvas.workspaceBackground", "Dots");
+  const background = [244, 241, 234, 255] as const;
+  await setSwitch(page, "overlay.exportDots", false);
+  const plain = (await inspectToolcraftImageDownload({ page, download: await downloadImage(page), backgroundRgba: background })).inspection;
+  await setSwitch(page, "overlay.exportDots", true);
+  await expectToolcraftExportedArtifact(session.targetAction("overlay.exportDots", () => downloadImage(page)), async (download) => {
+    const inspected = (await inspectToolcraftImageDownload({ page, download, backgroundRgba: background })).inspection;
+    expect(inspected.decodedPixelHash).not.toBe(plain.decodedPixelHash);
+    return inspected;
+  }, { requirementId: "overlay.exportDots" });
+});

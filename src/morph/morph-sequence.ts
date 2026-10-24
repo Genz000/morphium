@@ -1,12 +1,20 @@
 import type { EasingFn } from "./morph-easing";
 import type { SequenceMode } from "./morph-types";
 
-/** Keyframe order for one loop. Both modes start and end on frame 1, so the loop seam matches. */
+/**
+ * Keyframe order for one cycle. Loop and Ping-pong start and end on frame 1 so
+ * the loop seam matches; Once runs 1 → last and ends resting on the last frame.
+ */
 export function keyOrder(frameCount: number, mode: SequenceMode): number[] {
   if (frameCount < 2) return [0];
   const forward = Array.from({ length: frameCount }, (_, i) => i);
+  if (mode === "once") return forward;
   return mode === "pingpong" ? [...forward, ...forward.slice(0, -1).reverse()] : [...forward, 0];
 }
+
+/** Once ends with a rest on the last frame: Delay plus the last frame hold. */
+const finalRestMs = (mode: SequenceMode, t: StepTiming) =>
+  mode === "once" ? Math.max(0, t.delay) + Math.max(0, t.lastHold) : 0;
 
 export type MorphPhase = { a: number; b: number; p: number; raw: number; holding: boolean };
 
@@ -21,7 +29,7 @@ export function stepHolds(frameCount: number, mode: SequenceMode, t: StepTiming)
 
 /** One full loop in milliseconds. */
 export function loopMs(frameCount: number, mode: SequenceMode, t: StepTiming): number {
-  return stepHolds(frameCount, mode, t).reduce((sum, hold) => sum + hold + Math.max(1, t.duration), 0);
+  return stepHolds(frameCount, mode, t).reduce((sum, hold) => sum + hold + Math.max(1, t.duration), 0) + finalRestMs(mode, t);
 }
 
 /**
@@ -50,14 +58,19 @@ function phaseAtTime(progress: number, frameCount: number, mode: SequenceMode, e
   const holds = stepHolds(frameCount, mode, t);
   const duration = Math.max(1, t.duration);
   let time = Math.min(Math.max(progress, 0), 1) * loopMs(frameCount, mode, t);
+  const resting = finalRestMs(mode, t) > 0;
   for (let i = 0; i < holds.length; i++) {
     const step = holds[i] + duration;
-    if (time < step || i === holds.length - 1) {
+    if (time < step || (i === holds.length - 1 && !resting)) {
       if (time < holds[i]) return { a: order[i], b: order[i + 1], p: 0, raw: 0, holding: true };
       const raw = Math.min(1, (time - holds[i]) / duration);
       return { a: order[i], b: order[i + 1], p: ease(raw), raw, holding: false };
     }
     time -= step;
+  }
+  if (resting) {
+    const last = order[order.length - 1];
+    return { a: last, b: last, p: 0, raw: 0, holding: true };
   }
   return { a: order[0], b: order[1], p: 0, raw: 0, holding: true };
 }

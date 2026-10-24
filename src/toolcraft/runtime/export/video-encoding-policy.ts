@@ -13,14 +13,16 @@ export type ToolcraftVideoEncodingSupport = Readonly<{
 }>;
 
 /**
- * Constant-quality targets (FFmpeg CRF equivalents) for web-optimized video:
- * VP9 40 and H.265 32 give similar bitrates; H.264 28 is the matching level for
- * browsers without H.265. VP8 has no quantizer mode and stays bitrate-driven.
+ * Constant-quality targets (FFmpeg CRF equivalents). The web-video defaults
+ * (VP9 40, H.265 32) smear Morphium content: 1 px outlines, small labels and
+ * the 3 px workspace dots at 10% contrast disappear. These levels keep that
+ * line art while flat colour areas still compress to small files.
+ * VP8 has no quantizer mode and stays bitrate-driven.
  */
 export const TOOLCRAFT_VIDEO_CONSTANT_QUALITY: Readonly<Partial<Record<ToolcraftVideoCodec, number>>> = Object.freeze({
-  avc: 28,
-  hevc: 32,
-  vp9: 40,
+  avc: 20,
+  hevc: 22,
+  vp9: 30,
 });
 
 export type ToolcraftVideoEncodingPolicy = Readonly<{

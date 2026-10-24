@@ -4,10 +4,11 @@ import { expectToolcraftImageExportArtifact, expectToolcraftVideoExportArtifact 
 import { inspectToolcraftImageDownload } from "./image-artifact-inspection";
 import { expect, test } from "./toolcraft-product-test";
 import { BACKGROUND_RGBA, circleBounds, circlePixels, oneSecondSchedule, videoSamples } from "./morph-export-fixtures";
-import { downloadImage, downloadVideo, editDuration, openMorph, selectOption } from "./morph-test-helpers";
+import { downloadImage, downloadVideo, editDuration, openMorph, selectOption, setSwitch } from "./morph-test-helpers";
 
 test("browser: morph image export delivers all formats and sizes", async ({ page }) => {
   const session = await openMorph(page, { pauseAt: 0 });
+  await setSwitch(page, "overlay.exportDots", false);
   const infinity = page.getByRole("switch", { name: "Infinity canvas", exact: true });
   if (await infinity.isChecked()) await infinity.uncheck();
   for (const [format, mediaType] of [["PNG", "image/png"], ["JPG", "image/jpeg"]] as const) {
@@ -40,6 +41,7 @@ test("browser: morph image export delivers all formats and sizes", async ({ page
 
 test("browser: morph footer exports PNG and video", async ({ page }) => {
   const session = await openMorph(page, { pauseAt: 0 });
+  await setSwitch(page, "overlay.exportDots", false);
   await editDuration(page, 1);
   await selectOption(page, "export.image.resolution", "2K");
   await expectToolcraftImageExportArtifact(session.targetAction("actions.output", () => downloadImage(page)), {

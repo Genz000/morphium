@@ -38,8 +38,8 @@ export const fittingControls = {
 export const motionControls = {
   sequence: {
     ...live, type: "segmented", target: "motion.sequence", label: "Sequence", defaultValue: d.sequence,
-    description: "Loop goes 1 → last → 1. Ping-pong goes 1 → last → back to 1. Both start and end on frame 1.",
-    options: [{ label: "Loop", value: "loop" }, { label: "Ping-pong", value: "pingpong" }],
+    description: "Loop goes 1 → last → 1. Ping-pong goes 1 → last → back to 1. Once goes 1 → last and stops there, so exported video ends on the last frame.",
+    options: [{ label: "Loop", value: "loop" }, { label: "Ping-pong", value: "pingpong" }, { label: "Once", value: "once" }],
   },
   delay: {
     ...live, type: "slider", target: "motion.delay", label: "Delay", defaultValue: d.delay,
@@ -126,6 +126,10 @@ export const displayControls = {
   includeInExport: {
     ...live, type: "switch", target: "overlay.export", label: "Show in export", defaultValue: d.overlayExport,
     description: "Includes anchors, handles and coordinates in PNG, JPG and video exports.",
+  },
+  exportDots: {
+    ...live, type: "switch", target: "overlay.exportDots", label: "Dots in export", defaultValue: d.exportDots,
+    description: "When Workspace (in Settings) is Dots, draws the same dot grid behind the shape in PNG, JPG and video exports.",
   },
 } as const satisfies Record<string, ToolcraftControlSchema>;
 

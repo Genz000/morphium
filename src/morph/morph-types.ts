@@ -12,7 +12,7 @@ export type MorphFrame = { name: string; subs: Subpath[]; viewBox: ViewBox };
 
 export type FitMode = "viewbox" | "content";
 
-export type SequenceMode = "loop" | "pingpong";
+export type SequenceMode = "loop" | "pingpong" | "once";
 
 export type CoordinateLabels = "off" | "anchors" | "handles" | "both";
 

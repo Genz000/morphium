@@ -94,3 +94,26 @@ function drawOverlays(
   ctx.globalAlpha = 1;
   ctx.restore();
 }
+
+/**
+ * The canvas "Dots" workspace grid, drawn into exports: 3 px dots on a 24 px
+ * grid (scene units at 100% zoom) anchored to the scene origin like the
+ * editor, in the foreground ink at 10% opacity.
+ */
+export function drawWorkspaceDots(ctx: CanvasRenderingContext2D, frame: { x: number; y: number; width: number; height: number }, background: string) {
+  const gap = 24, radius = 1.5, phase = 11.5;
+  const startX = Math.ceil((frame.x + phase) / gap) * gap - phase;
+  const startY = Math.ceil((frame.y + phase) / gap) * gap - phase;
+  ctx.save();
+  ctx.fillStyle = contrastInk(background);
+  ctx.globalAlpha = 0.1;
+  ctx.beginPath();
+  for (let y = startY; y < frame.y + frame.height + radius; y += gap) {
+    for (let x = startX; x < frame.x + frame.width + radius; x += gap) {
+      ctx.moveTo(x + radius, y);
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    }
+  }
+  ctx.fill();
+  ctx.restore();
+}

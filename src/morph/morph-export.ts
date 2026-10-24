@@ -1,6 +1,6 @@
 import type { ToolcraftProductExportRenderer } from "@/toolcraft/runtime";
 
-import { drawMorphFrame } from "./morph-draw";
+import { drawMorphFrame, drawWorkspaceDots } from "./morph-draw";
 import { cachedFrames, frameAssets, framesKey, normalizedFrames } from "./morph-frames";
 import { exportPass } from "./morph-pipeline";
 import { readMorphSettings } from "./morph-settings";
@@ -25,6 +25,7 @@ export const morphExport: ToolcraftProductExportRenderer = {
       const map = stageMap(frames[0].viewBox, frame);
       const ui = Math.min(frame.width, frame.height) / 600;
       const background = String(state.values["appearance.background"] ?? "#F4F1EA");
+      if (settings.exportDots && state.values["canvas.workspaceBackground"] === "dots") drawWorkspaceDots(context, frame, background);
       drawMorphFrame(context, shape, map, settings, background, ui, settings.overlayExport, lastFrameWeight(phase, norm.length));
       signal.throwIfAborted();
     };

@@ -22,6 +22,7 @@ export const morphDefaults = {
   anchorColor: "#FF6A3D",
   handleColor: "#3DC2FF",
   overlayExport: false,
+  exportDots: true,
   fillOn: true,
   fill: "#141414",
   stroke: "#FF6A3D",
@@ -39,7 +40,7 @@ export const morphDefaults = {
 export type MorphSettings = {
   fit: FitMode; sequence: SequenceMode; delay: number; duration: number; hold: number; easing: string; curve: CurveValue;
   outline: boolean; anchors: boolean; handles: boolean; labels: CoordinateLabels; decimals: number;
-  labelSize: number; pointSize: number; anchorColor: string; handleColor: string; overlayExport: boolean;
+  labelSize: number; pointSize: number; anchorColor: string; handleColor: string; overlayExport: boolean; exportDots: boolean;
   fillOn: boolean; fill: string; stroke: string; strokeWidth: number; lineJoin: LineJoin;
   lastOn: boolean; lastStyle: "fill" | "outline"; lastFill: string; lastAnchors: boolean; lastHandles: boolean; lastHold: number;
 };
@@ -49,7 +50,7 @@ export const geometryTargets = [FRAMES_TARGET, "frames.fit"] as const;
 export const motionTargets = ["motion.sequence", "motion.delay", "motion.duration", "motion.easing", "motion.curve"] as const;
 export const overlayTargets = [
   "overlay.anchors", "overlay.handles", "overlay.labels", "overlay.decimals",
-  "overlay.labelSize", "overlay.pointSize", "overlay.anchorColor", "overlay.handleColor", "overlay.export",
+  "overlay.labelSize", "overlay.pointSize", "overlay.anchorColor", "overlay.handleColor", "overlay.export", "overlay.exportDots",
 ] as const;
 export const lastFrameTargets = ["lastFrame.hold", "lastFrame.on", "lastFrame.style", "lastFrame.fill", "lastFrame.anchors", "lastFrame.handles"] as const;
 export const shapeTargets = ["shape.outline", "shape.fillOn", "shape.fill", "shape.stroke", "shape.strokeWidth", "shape.lineJoin"] as const;
@@ -75,6 +76,7 @@ export function readMorphSettings(values: Readonly<Record<string, unknown>>): Mo
     anchorColor: v("overlay.anchorColor", d.anchorColor),
     handleColor: v("overlay.handleColor", d.handleColor),
     overlayExport: v("overlay.export", d.overlayExport),
+    exportDots: v("overlay.exportDots", d.exportDots),
     fillOn: v("shape.fillOn", d.fillOn),
     fill: v("shape.fill", d.fill),
     stroke: v("shape.stroke", d.stroke),

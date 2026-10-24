@@ -5,12 +5,13 @@ import { inspectToolcraftImageDownload } from "./image-artifact-inspection";
 import { expectToolcraftProductObservableToChange } from "./product-observable-helpers";
 import { expect, test } from "./toolcraft-product-test";
 import { inspectToolcraftVideoDownload } from "./video-artifact-inspection";
-import { downloadImage, downloadVideo, editDuration, field, openMorph, selectOption, setColor } from "./morph-test-helpers";
+import { downloadImage, downloadVideo, editDuration, field, openMorph, selectOption, setColor, setSwitch } from "./morph-test-helpers";
 
 const BACKGROUND = "#F4F1EA";
 
 test("browser: morph background color changes output", async ({ page }) => {
   const session = await openMorph(page);
+  await setSwitch(page, "overlay.exportDots", false);
   await expectToolcraftProductObservableToChange(
     session, session.controlAction("appearance.background", () => setColor(page, "appearance.background", "#123456")),
     { requirementId: "appearance.background", selector: "[data-toolcraft-editable-canvas]" },
@@ -21,6 +22,7 @@ test("browser: morph background color changes output", async ({ page }) => {
 
 test("browser: morph background output follows runtime semantics", async ({ page }) => {
   const session = await openMorph(page);
+  await setSwitch(page, "overlay.exportDots", false);
   await editDuration(page, 1);
   await selectOption(page, "export.image.resolution", "2K");
   const infinity = page.getByRole("switch", { name: "Infinity canvas", exact: true });
