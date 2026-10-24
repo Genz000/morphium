@@ -111,13 +111,18 @@ export function drawWorkspace(
   if (dots) drawWorkspaceDots(ctx, frame, workspace.dots);
 }
 
+export const EXPORT_DOT_OPACITY = 0.22;
+
 function drawWorkspaceDots(ctx: CanvasRenderingContext2D, frame: { x: number; y: number; width: number; height: number }, dotColor: string) {
-  const gap = 24, radius = 1.5, phase = 11.5;
+  // Same grid as the editor (24 px, anchored like the canvas). Dots are drawn a little larger and
+  // stronger than the on-screen 10% so they survive video compression and players that crush
+  // the darkest tones; at 10% they vanished in H.265 MP4 playback.
+  const gap = 24, radius = 1.75, phase = 11.5;
   const startX = Math.ceil((frame.x + phase) / gap) * gap - phase;
   const startY = Math.ceil((frame.y + phase) / gap) * gap - phase;
   ctx.save();
   ctx.fillStyle = dotColor;
-  ctx.globalAlpha = 0.1;
+  ctx.globalAlpha = EXPORT_DOT_OPACITY;
   ctx.beginPath();
   for (let y = startY; y < frame.y + frame.height + radius; y += gap) {
     for (let x = startX; x < frame.x + frame.width + radius; x += gap) {
