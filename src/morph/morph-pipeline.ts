@@ -54,7 +54,7 @@ export const morphPipeline = registerToolcraftRendererPipeline<{
     { interaction: "timeline-scrub", targets: ["timeline"], invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"] },
     {
       interaction: "control-drag",
-      targets: ["frames.scale", "motion.delay", "motion.duration", "lastFrame.hold", "overlay.labelSize", "overlay.pointSize", "shape.strokeWidth"],
+      targets: ["frames.scale", "frames.x", "frames.y", "motion.delay", "motion.duration", "lastFrame.hold", "overlay.labelSize", "overlay.pointSize", "shape.strokeWidth"],
       invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"],
     },
     {

@@ -1,7 +1,7 @@
 import type { ToolcraftControlSchema } from "@/toolcraft/runtime";
 
 import { EASING_PRESETS } from "./morph-easing";
-import { FRAMES_TARGET, MAX_FRAMES, morphDefaults as d } from "./morph-settings";
+import { CENTER_ACTION, FRAMES_TARGET, MAX_FRAMES, morphDefaults as d } from "./morph-settings";
 
 const always = { applicability: { mode: "always" } } as const;
 const live = {
@@ -37,6 +37,20 @@ export const fittingControls = {
     ...live, type: "slider", target: "frames.scale", label: "Scale", defaultValue: d.scale,
     min: 10, max: 300, step: 1, unit: "%", sliderValueKind: "continuous", editableRange: { hardMin: 1, hardMax: 1000 },
     description: "Size of the artwork on the canvas, around its centre. 100% fits the first frame to the canvas. Applies to the preview and every export.",
+  },
+  x: {
+    ...live, type: "slider", target: "frames.x", label: "Position X", defaultValue: d.x,
+    min: -1000, max: 1000, step: 1, unit: "px", sliderValueKind: "continuous", editableRange: { hardMin: -10000, hardMax: 10000 },
+    description: "Moves the artwork left or right on the canvas, in canvas pixels. 0 is centred.",
+  },
+  y: {
+    ...live, type: "slider", target: "frames.y", label: "Position Y", defaultValue: d.y,
+    min: -1000, max: 1000, step: 1, unit: "px", sliderValueKind: "continuous", editableRange: { hardMin: -10000, hardMax: 10000 },
+    description: "Moves the artwork up or down on the canvas, in canvas pixels. 0 is centred; positive values move it down.",
+  },
+  center: {
+    ...always, type: "actions", target: CENTER_ACTION, label: "Placement",
+    actions: [{ label: "Center", value: CENTER_ACTION, variant: "secondary" }],
   },
 } as const satisfies Record<string, ToolcraftControlSchema>;
 

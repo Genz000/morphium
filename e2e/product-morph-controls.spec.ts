@@ -77,6 +77,12 @@ const slider = (fractions: readonly number[]) => async (ctx: Ctx) => {
 const specs: Record<string, Spec> = {
   "frames.fit": { prove: cycleSegment },
   "frames.scale": { prove: slider([0.2, 0.8, 0.5]) },
+  "frames.x": { prove: slider([0.2, 0.8, 0.5]) },
+  "frames.y": { prove: slider([0.8, 0.2, 0.5]) },
+  "frames.center": {
+    prepare: async (page) => { await setSlider(page, "frames.x", 300); await setSlider(page, "frames.y", -150); },
+    prove: async (ctx) => change(ctx, () => ctx.page.getByRole("button", { name: "Center", exact: true }).click()),
+  },
   "motion.sequence": { prepare: (page) => pauseTimelineAt(page, 0.6), prove: cycleSegment },
   "motion.delay": { prove: slider([0.85, 0.1, 0.5]) },
   "motion.duration": { prove: slider([0.8, 0.1, 0.5]) },

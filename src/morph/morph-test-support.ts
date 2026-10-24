@@ -55,6 +55,6 @@ export function drawSignature(
   const { shape, phase } = shapeAtProgress(norm, progress, settings);
   const { context, calls } = recordingContext();
   const background = String(values["appearance.background"] ?? "#F4F1EA");
-  drawMorphFrame(context, shape, stageMap(frames[0].viewBox, frame, settings.scale / 100), settings, background, Math.min(frame.width, frame.height) / 600, overlays && (values["overlay.export"] === undefined || settings.overlayExport), lastFrameWeight(phase, norm.length));
+  drawMorphFrame(context, shape, stageMap(frames[0].viewBox, frame, settings.scale / 100, settings), settings, background, Math.min(frame.width, frame.height) / 600, overlays && (values["overlay.export"] === undefined || settings.overlayExport), lastFrameWeight(phase, norm.length));
   return createHash("sha256").update(JSON.stringify(calls)).digest("hex");
 }

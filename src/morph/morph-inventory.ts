@@ -23,7 +23,7 @@ export const morphSectionInventory = [
   {
     id: "frame-fitting", title: "Fitting", entityId: "frames", entity: "SVG frames", workflowStage: "fitting",
     splitReason: "How frames are aligned to each other is set after upload and resets independently of the file list.",
-    targets: ["frames.fit", "frames.scale"], groupingReason: "How the uploaded frames are aligned to each other and sized on the canvas.",
+    targets: ["frames.fit", "frames.scale", "frames.x", "frames.y", "frames.center"], groupingReason: "How the uploaded frames are aligned to each other and sized on the canvas.",
     finiteSelectors: [{ target: "frames.fit", role: "parameter", reason: "Changes how each frame is scaled into frame 1; no other control depends on it." }],
   },
   {
@@ -114,6 +114,14 @@ export const morphReadiness: ToolcraftProductReadiness = {
     },
     panelProperty("frames.fit", "The original sidebar had a viewBox/Content segmented control."),
     panelProperty("frames.scale", "Requested by the user: a scale value in the panel to size the SVG on the canvas."),
+    panelProperty("frames.x", "Requested by the user: position x and y controls in the panel."),
+    panelProperty("frames.y", "Requested by the user: position x and y controls in the panel."),
+    {
+      id: "frames.center-command", target: "frames.center", capability: "command" as const, surface: "panel" as const,
+      evidence: { source: "user-request" as const, detail: "Requested by the user: a button to center the SVG on the canvas." },
+      reason: "A one-click command next to the position values it resets.",
+      alternative: { surface: "canvas" as const, reason: "A button on the canvas would cover the artwork." },
+    },
     ...motionTargets.map((t) => panelProperty(t, "The original sidebar held sequence, hold and easing controls.")),
     ...shapeTargets.map((t) => panelProperty(t, "The original sidebar held outline, fill and stroke controls.")),
     ...lastFrameTargets.map((t) => panelProperty(t, "Requested by the user: outline on every frame, solid fill on the last one.")),

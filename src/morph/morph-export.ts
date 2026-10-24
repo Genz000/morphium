@@ -23,7 +23,7 @@ export const morphExport: ToolcraftProductExportRenderer = {
       const settings = readMorphSettings(state.values);
       const norm = normalizedFrames(frames, framesKey(assets), settings.fit);
       const { shape, phase } = shapeAtProgress(norm, timelineProgress, settings);
-      const map = stageMap(frames[0].viewBox, frame, settings.scale / 100);
+      const map = stageMap(frames[0].viewBox, frame, settings.scale / 100, settings);
       const ui = Math.min(frame.width, frame.height) / 600;
       // Background off shows the editor workspace in the preview; export the same backdrop.
       const workspace = workspaceColors();

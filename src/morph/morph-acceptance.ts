@@ -33,7 +33,7 @@ const controlRows: Row[] = productControls.map((control) => {
   const options = "options" in control ? optionsOf(control) : undefined;
   const target = control.target;
   return {
-    id: target, target, kind: "control", componentType: control.type, interactionId: `${target}-property`,
+    id: target, target, kind: "control", componentType: control.type, interactionId: control.type === "actions" ? `${target}-command` : `${target}-property`,
     automated: true, automatedTestName: `morph parameter ${target}`,
     browser: browser("product-morph-controls", `browser: morph parameter ${target}`),
     evidence: target === "overlay.export" || target === "overlay.exportDots" ? "exported-bytes" : "product-output",

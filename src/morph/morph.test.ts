@@ -33,6 +33,8 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
   "lastFrame.handles": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
   "frames.fit": { value: "content" },
   "frames.scale": { value: 150 },
+  "frames.x": { value: -300 },
+  "frames.y": { value: 200 },
   "motion.sequence": { value: "pingpong" },
   "motion.delay": { value: 1500 },
   "motion.duration": { value: 400 },
@@ -57,6 +59,14 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
 
 for (const row of appAcceptance.filter((r) => r.automatedTestName.startsWith("morph parameter"))) {
   it(row.automatedTestName, async () => {
+    if (row.target === "frames.center") {
+      // Center resets Position X and Y to 0: the moved artwork returns to the canvas centre.
+      const moved = { "frames.x": 250, "frames.y": -120 };
+      expect(drawSignature(moved)).not.toBe(drawSignature({}));
+      const centred = Object.fromEntries(Object.entries(moved).map(([k]) => [k, 0]));
+      expect(drawSignature(centred)).toBe(drawSignature({}));
+      return;
+    }
     if (row.target === "overlay.exportDots") {
       // With Background off, exports draw the editor workspace (and its dots) like the preview.
       await primeCache(["circle", "star", "blob", "ring"]);
@@ -163,6 +173,10 @@ const contractTests: Record<string, () => void | Promise<void>> = {
     expect(half.s).toBe(1080 / 800);
     expect(200 * half.s + half.ox).toBe(FRAME.x + FRAME.width / 2);
     expect(200 * half.s + half.oy).toBe(FRAME.y + FRAME.height / 2);
+    // Position offsets move the centre by exactly x, y canvas pixels.
+    const moved = stageMap([0, 0, 400, 400], FRAME, 1, { x: -300, y: 200 });
+    expect(200 * moved.s + moved.ox).toBe(FRAME.x + FRAME.width / 2 - 300);
+    expect(200 * moved.s + moved.oy).toBe(FRAME.y + FRAME.height / 2 + 200);
   },
   "canvas.infinity": () => {
     const state = createToolcraftState(appSchema);
