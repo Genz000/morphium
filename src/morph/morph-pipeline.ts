@@ -1,6 +1,6 @@
 import { registerToolcraftRendererPipeline, type ToolcraftRendererPipelinePassContract } from "@/toolcraft/runtime";
 
-import { geometryTargets, motionTargets, overlayTargets, shapeTargets } from "./morph-settings";
+import { geometryTargets, lastFrameTargets, motionTargets, overlayTargets, shapeTargets } from "./morph-settings";
 import type { FrameEntry } from "./morph-frames";
 import type { Subpath } from "./morph-types";
 
@@ -11,7 +11,7 @@ const STAGE = {
 
 const canvasTargets = ["canvas.size.width", "canvas.size.height"];
 const timelineTargets = ["timeline.currentTimeSeconds", "timeline.durationSeconds"];
-const sceneInputs = [...motionTargets, ...shapeTargets, ...overlayTargets, ...canvasTargets, ...timelineTargets];
+const sceneInputs = [...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets, ...timelineTargets];
 
 export const morphPipeline = registerToolcraftRendererPipeline<{
   decode: ToolcraftRendererPipelinePassContract<readonly FrameEntry[]>;
@@ -59,7 +59,7 @@ export const morphPipeline = registerToolcraftRendererPipeline<{
     },
     {
       interaction: "control-change",
-      targets: [...motionTargets, ...shapeTargets, ...overlayTargets, ...canvasTargets],
+      targets: [...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets],
       invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"],
     },
     {

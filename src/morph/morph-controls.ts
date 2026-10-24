@@ -128,3 +128,19 @@ export const displayControls = {
     description: "Includes anchors, handles and coordinates in PNG, JPG and video exports.",
   },
 } as const satisfies Record<string, ToolcraftControlSchema>;
+
+export const lastFrameControls = {
+  on: {
+    ...live, type: "switch", target: "lastFrame.on", label: "Style last frame", defaultValue: d.lastOn,
+    description: "Gives the final frame its own look. It fades in as the shape morphs into the last frame and back out as the loop returns.",
+  },
+  style: {
+    ...live, ...when("lastFrame.on", { equals: true }), type: "segmented", target: "lastFrame.style", label: "Look",
+    defaultValue: d.lastStyle, options: [{ label: "Fill", value: "fill" }, { label: "Outline", value: "outline" }],
+  },
+  fill: {
+    ...live,
+    applicability: { mode: "conditional", all: [{ target: "lastFrame.on", equals: true }, { target: "lastFrame.style", equals: "fill" }] },
+    type: "color", target: "lastFrame.fill", label: "Last frame color", defaultValue: d.lastFill,
+  },
+} as const satisfies Record<string, ToolcraftControlSchema>;

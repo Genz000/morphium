@@ -5,7 +5,7 @@ import { DEMO_FRAMES, starPath } from "./morph-default-assets";
 import { normalizeFrames } from "./morph-normalize";
 import { pathToSubpaths } from "./morph-path";
 import { readMorphSettings } from "./morph-settings";
-import { shapeAtProgress, stageMap, type Rect } from "./morph-scene";
+import { lastFrameWeight, shapeAtProgress, stageMap, type Rect } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
 
 /** Records Path2D commands so drawing can be fingerprinted in Node. */
@@ -52,9 +52,9 @@ export function drawSignature(
 ) {
   const settings = readMorphSettings(values);
   const norm = normalizeFrames(frames, settings.fit);
-  const { shape } = shapeAtProgress(norm, progress, settings);
+  const { shape, phase } = shapeAtProgress(norm, progress, settings);
   const { context, calls } = recordingContext();
   const background = String(values["appearance.background"] ?? "#F4F1EA");
-  drawMorphFrame(context, shape, stageMap(frames[0].viewBox, frame), settings, background, Math.min(frame.width, frame.height) / 600, overlays && (values["overlay.export"] === undefined || settings.overlayExport));
+  drawMorphFrame(context, shape, stageMap(frames[0].viewBox, frame), settings, background, Math.min(frame.width, frame.height) / 600, overlays && (values["overlay.export"] === undefined || settings.overlayExport), lastFrameWeight(phase, norm.length));
   return createHash("sha256").update(JSON.stringify(calls)).digest("hex");
 }

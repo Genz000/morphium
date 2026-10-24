@@ -82,3 +82,29 @@ export function contrastInk(hex: string) {
   const n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   return 0.299 * r + 0.587 * g + 0.114 * b > 140 ? "#111111" : "#F2F2F2";
 }
+
+/** How one copy of the path is painted. */
+export type PaintStyle = { outline: boolean; fillOn: boolean; fill: string; stroke: string; strokeWidth: number };
+
+export const baseStyle = (s: MorphSettings): PaintStyle =>
+  ({ outline: s.outline, fillOn: s.fillOn, fill: s.fill, stroke: s.stroke, strokeWidth: s.strokeWidth });
+
+/** The last frame's own look, or null when it uses the shared style. */
+export function lastFrameStyle(s: MorphSettings): PaintStyle | null {
+  if (!s.lastOn) return null;
+  return s.lastStyle === "outline"
+    ? { outline: true, fillOn: false, fill: s.lastFill, stroke: s.stroke, strokeWidth: 0 }
+    : { outline: false, fillOn: true, fill: s.lastFill, stroke: s.stroke, strokeWidth: 0 };
+}
+
+/**
+ * How much of the current shape is the last frame: 1 while resting on it, 0 on
+ * any other frame, and the eased morph amount while moving into or out of it.
+ * The last-frame style fades in and out by this weight.
+ */
+export function lastFrameWeight(phase: MorphPhase, frameCount: number): number {
+  if (frameCount < 2) return 0;
+  const last = frameCount - 1;
+  const p = Math.min(Math.max(phase.p, 0), 1);
+  return (phase.a === last ? 1 - p : 0) + (phase.b === last ? p : 0);
+}

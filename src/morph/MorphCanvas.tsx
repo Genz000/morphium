@@ -11,7 +11,7 @@ import { decodePass, normalizePass, scenePass } from "./morph-pipeline";
 import { MorphOverlays } from "./MorphOverlays";
 import { readMorphSettings } from "./morph-settings";
 import { keyOrder } from "./morph-sequence";
-import { contrastInk, pathData, shapeAtProgress, stageMap } from "./morph-scene";
+import { baseStyle, contrastInk, lastFrameStyle, lastFrameWeight, pathData, shapeAtProgress, stageMap, type PaintStyle } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
 import styles from "./morph.module.css";
 
@@ -68,6 +68,15 @@ export function MorphCanvas() {
   const map = frames.length ? stageMap(frames[0].viewBox, local) : null;
   const ui = Math.min(rect.width, rect.height) / 600;
   const d = pathData(shape);
+  const last = lastFrameStyle(settings);
+  const lastWeight = last ? lastFrameWeight(phase, norm.length) : 0;
+  const paintProps = (style: PaintStyle) => style.outline
+    ? { fill: "none", stroke: contrastInk(background), strokeWidth: ui / map!.s }
+    : {
+        fillRule: "evenodd" as const, fill: style.fillOn ? style.fill : "none",
+        stroke: style.strokeWidth > 0 ? style.stroke : "none", strokeWidth: style.strokeWidth,
+        strokeLinejoin: settings.lineJoin, strokeLinecap: "round" as const, strokeMiterlimit: 8,
+      };
   const frameReady = scene.status === "success" && normalized.status === "success" && Boolean(map);
 
   return (
@@ -86,16 +95,8 @@ export function MorphCanvas() {
     >
       {map && d ? (
         <g transform={`matrix(${map.s} 0 0 ${map.s} ${map.ox} ${map.oy})`}>
-          {settings.outline ? (
-            <path data-testid="morph-shape" d={d} fill="none" stroke={contrastInk(background)} strokeWidth={ui / map.s} />
-          ) : (
-            <path
-              data-testid="morph-shape" d={d} fillRule="evenodd"
-              fill={settings.fillOn ? settings.fill : "none"}
-              stroke={settings.strokeWidth > 0 ? settings.stroke : "none"}
-              strokeWidth={settings.strokeWidth} strokeLinejoin={settings.lineJoin} strokeLinecap="round" strokeMiterlimit={8}
-            />
-          )}
+          <path data-testid="morph-shape" d={d} opacity={1 - lastWeight} {...paintProps(baseStyle(settings))} />
+          {last ? <path data-testid="morph-shape-last" d={d} opacity={lastWeight} {...paintProps(last)} /> : null}
         </g>
       ) : null}
       {map ? <MorphOverlays shape={shape} map={map} settings={settings} ui={ui} /> : null}

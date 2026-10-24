@@ -26,7 +26,7 @@ const change = ({ session, target, requirementId }: Ctx, act: () => Promise<void
 
 /** Selector defaults that keep every dependent control reachable. */
 const selectorDefaults: Record<string, boolean | string> = {
-  "shape.outline": false, "shape.fillOn": true, "overlay.anchors": true, "overlay.handles": true,
+  "shape.outline": false, "shape.fillOn": true, "lastFrame.on": true, "overlay.anchors": true, "overlay.handles": true,
 };
 
 async function setSelector(page: Page, target: string, value: unknown, optionLabel?: string) {
@@ -126,6 +126,9 @@ const specs: Record<string, Spec> = {
     prepare: async (page) => { await setSlider(page, "shape.strokeWidth", 14); await pauseTimelineAt(page, 0.28); },
     prove: cycleSegment,
   },
+  "lastFrame.on": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: toggle },
+  "lastFrame.style": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: cycleSegment },
+  "lastFrame.fill": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: color(["#2F5BFF", "#22AA66", "#AA1144"]) },
   "overlay.anchors": { prove: toggle },
   "overlay.anchorColor": { prove: color(["#AA00FF", "#00CCAA"]) },
   "overlay.handles": { prove: toggle },

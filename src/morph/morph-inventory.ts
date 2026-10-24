@@ -1,6 +1,6 @@
 import type { ToolcraftControlSectionInventoryEntry, ToolcraftProductReadiness } from "../app/acceptance/types";
 
-import { motionTargets, overlayTargets, shapeTargets } from "./morph-settings";
+import { lastFrameTargets, motionTargets, overlayTargets, shapeTargets } from "./morph-settings";
 
 /** The user's first message in this session, kept verbatim as export-request evidence. */
 export const ORIGINAL_REQUEST_TEXT =
@@ -41,6 +41,14 @@ export const morphSectionInventory = [
       { target: "shape.outline", role: "branch", affectedTargets: [], reason: "Outline view ignores fill and stroke, so their controls are absent while it is on." },
       { target: "shape.fillOn", role: "branch", affectedTargets: [], reason: "Fill colour applies only while Fill is on." },
       { target: "shape.lineJoin", role: "parameter", reason: "Changes stroke corners only." },
+    ],
+  },
+  {
+    id: "last-frame", title: "Last Frame", entityId: "last-frame", entity: "Last frame style", targets: [...lastFrameTargets],
+    groupingReason: "An optional look for the final frame that crossfades with the shared shape style.",
+    finiteSelectors: [
+      { target: "lastFrame.on", role: "branch", affectedTargets: [], reason: "Look and colour apply only while the last frame has its own style." },
+      { target: "lastFrame.style", role: "branch", affectedTargets: [], reason: "The colour applies only to the Fill look." },
     ],
   },
   {
@@ -104,6 +112,7 @@ export const morphReadiness: ToolcraftProductReadiness = {
     panelProperty("frames.fit", "The original sidebar had a viewBox/Content segmented control."),
     ...motionTargets.map((t) => panelProperty(t, "The original sidebar held sequence, hold and easing controls.")),
     ...shapeTargets.map((t) => panelProperty(t, "The original sidebar held outline, fill and stroke controls.")),
+    ...lastFrameTargets.map((t) => panelProperty(t, "Requested by the user: outline on every frame, solid fill on the last one.")),
     ...overlayTargets.map((t) => panelProperty(t, "The original sidebar held anchor, handle and label controls.")),
   ],
 };

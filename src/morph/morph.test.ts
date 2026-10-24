@@ -18,11 +18,16 @@ import { arcToCubics, parsePathData, pathToSubpaths } from "./morph-path";
 import { keyOrder, phaseAt } from "./morph-sequence";
 import { FRAMES_TARGET, morphDefaults, readMorphSettings } from "./morph-settings";
 import { drawMorphFrame } from "./morph-draw";
-import { formatCoordinate, overlayGeometry, shapeAtProgress, stageMap } from "./morph-scene";
+import { formatCoordinate, lastFrameWeight, overlayGeometry, shapeAtProgress, stageMap } from "./morph-scene";
 import { demoFrames, drawSignature, FRAME, MID_MORPH, recordingContext } from "./morph-test-support";
 
 /** Values that make each control's effect visible at the mid-morph fixture. */
-const changes: Record<string, { base?: Record<string, unknown>; value: unknown }> = {
+/** 0.78 rests on the last demo frame (ring). */
+const ON_LAST = 0.78;
+const changes: Record<string, { base?: Record<string, unknown>; value: unknown; progress?: number }> = {
+  "lastFrame.on": { value: true, progress: ON_LAST },
+  "lastFrame.style": { base: { "lastFrame.on": true }, value: "outline", progress: ON_LAST },
+  "lastFrame.fill": { base: { "lastFrame.on": true }, value: "#2F5BFF", progress: ON_LAST },
   "frames.fit": { value: "content" },
   "motion.sequence": { value: "pingpong" },
   "motion.delay": { value: 1500 },
@@ -51,7 +56,8 @@ for (const row of appAcceptance.filter((r) => r.automatedTestName.startsWith("mo
     const change = changes[row.target!];
     expect(change, `fixture for ${row.target}`).toBeDefined();
     const base = change.base ?? {};
-    expect(drawSignature({ ...base, [row.target!]: change.value })).not.toBe(drawSignature(base));
+    const at = { progress: change.progress ?? MID_MORPH };
+    expect(drawSignature({ ...base, [row.target!]: change.value }, at)).not.toBe(drawSignature(base, at));
   });
 }
 
@@ -160,6 +166,23 @@ it("morph render plan has valid derived paths and fixtures", () => {
       expect(compileToolcraftPerformanceFixturePlan(appPerformance, path).dimensionIds).toEqual(path.workloadDimensions);
     }
   }
+});
+
+describe("last frame style", () => {
+  it("weights the last frame by how far the morph has reached it", () => {
+    const ease = resolveEasing("linear", undefined);
+    expect(lastFrameWeight(phaseAt(0.78, 4, "loop", 30, ease), 4)).toBe(1);
+    expect(lastFrameWeight(phaseAt(0.15, 4, "loop", 30, ease), 4)).toBe(0);
+    const into = lastFrameWeight(phaseAt(0.7, 4, "loop", 30, ease), 4);
+    expect(into).toBeGreaterThan(0); expect(into).toBeLessThan(1);
+    expect(lastFrameWeight(phaseAt(0.95, 4, "loop", 30, ease), 4)).toBeLessThan(1);
+  });
+  it("leaves every other frame untouched", () => {
+    expect(drawSignature({ "lastFrame.on": true, "shape.outline": true }, { progress: MID_MORPH }))
+      .toBe(drawSignature({ "shape.outline": true }, { progress: MID_MORPH }));
+    expect(drawSignature({ "lastFrame.on": true, "shape.outline": true }, { progress: 0.78 }))
+      .not.toBe(drawSignature({ "shape.outline": true }, { progress: 0.78 }));
+  });
 });
 
 describe("morph engine (ported from the original page)", () => {

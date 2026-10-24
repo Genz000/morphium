@@ -1,7 +1,7 @@
 import type { ToolcraftComponentAcceptance, ToolcraftReferenceCoverage } from "../app/acceptance/types";
 import { appSchema } from "../app/app-schema";
 
-import { displayControls, fittingControls, motionControls, shapeControls } from "./morph-controls";
+import { displayControls, fittingControls, lastFrameControls, motionControls, shapeControls } from "./morph-controls";
 
 type Budget = "standard" | "extended-io";
 type Row = ToolcraftComponentAcceptance;
@@ -14,7 +14,6 @@ const referenceCoverage: Record<string, ToolcraftReferenceCoverage> = {
   "frames.fit": "renderer-state",
   "motion.sequence": "control-mapping",
   "motion.delay": "control-mapping",
-  "motion.duration": "control-mapping",
   "motion.easing": "control-mapping",
   "motion.curve": "control-mapping",
   "shape.outline": "control-mapping",
@@ -28,9 +27,9 @@ const referenceCoverage: Record<string, ToolcraftReferenceCoverage> = {
 
 const optionsOf = (control: { options?: readonly { value: string }[] }) => control.options?.map((o) => o.value);
 
-const productControls = { ...fittingControls, ...motionControls, ...shapeControls, ...displayControls };
+const productControls = [fittingControls, motionControls, shapeControls, lastFrameControls, displayControls].flatMap((section) => Object.values(section));
 
-const controlRows: Row[] = Object.values(productControls).map((control) => {
+const controlRows: Row[] = productControls.map((control) => {
   const options = "options" in control ? optionsOf(control) : undefined;
   const target = control.target;
   return {

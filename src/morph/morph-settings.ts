@@ -28,6 +28,9 @@ export const morphDefaults = {
   strokeWidth: 0,
   lineJoin: "round" as LineJoin,
   background: "#F4F1EA",
+  lastOn: false,
+  lastStyle: "fill" as "fill" | "outline",
+  lastFill: "#FF6A3D",
 };
 
 export type MorphSettings = {
@@ -35,6 +38,7 @@ export type MorphSettings = {
   outline: boolean; anchors: boolean; handles: boolean; labels: CoordinateLabels; decimals: number;
   labelSize: number; pointSize: number; anchorColor: string; handleColor: string; overlayExport: boolean;
   fillOn: boolean; fill: string; stroke: string; strokeWidth: number; lineJoin: LineJoin;
+  lastOn: boolean; lastStyle: "fill" | "outline"; lastFill: string;
 };
 
 /** Targets that change frame geometry (normalisation) versus paint only. */
@@ -44,6 +48,7 @@ export const overlayTargets = [
   "overlay.anchors", "overlay.handles", "overlay.labels", "overlay.decimals",
   "overlay.labelSize", "overlay.pointSize", "overlay.anchorColor", "overlay.handleColor", "overlay.export",
 ] as const;
+export const lastFrameTargets = ["lastFrame.on", "lastFrame.style", "lastFrame.fill"] as const;
 export const shapeTargets = ["shape.outline", "shape.fillOn", "shape.fill", "shape.stroke", "shape.strokeWidth", "shape.lineJoin"] as const;
 
 export function readMorphSettings(values: Readonly<Record<string, unknown>>): MorphSettings {
@@ -72,5 +77,8 @@ export function readMorphSettings(values: Readonly<Record<string, unknown>>): Mo
     stroke: v("shape.stroke", d.stroke),
     strokeWidth: v("shape.strokeWidth", d.strokeWidth),
     lineJoin: v("shape.lineJoin", d.lineJoin),
+    lastOn: v("lastFrame.on", d.lastOn),
+    lastStyle: v("lastFrame.style", d.lastStyle),
+    lastFill: v("lastFrame.fill", d.lastFill),
   };
 }

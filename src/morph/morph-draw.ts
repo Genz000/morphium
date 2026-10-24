@@ -1,6 +1,6 @@
 import type { MorphSettings } from "./morph-settings";
 import {
-  contrastInk, formatCoordinate, overlayGeometry, showsAnchorLabels, showsHandleLabels, type StageMap,
+  baseStyle, contrastInk, formatCoordinate, lastFrameStyle, type PaintStyle, overlayGeometry, showsAnchorLabels, showsHandleLabels, type StageMap,
 } from "./morph-scene";
 import type { Subpath } from "./morph-types";
 
@@ -21,7 +21,7 @@ function buildPath(shape: readonly Subpath[]) {
  */
 export function drawMorphFrame(
   ctx: CanvasRenderingContext2D, shape: readonly Subpath[], map: StageMap, settings: MorphSettings,
-  background: string, ui: number, includeOverlays: boolean,
+  background: string, ui: number, includeOverlays: boolean, lastWeight = 0,
 ) {
   const path = buildPath(shape);
   ctx.save();
@@ -29,16 +29,25 @@ export function drawMorphFrame(
   ctx.lineJoin = settings.lineJoin;
   ctx.lineCap = "round";
   ctx.miterLimit = 8;
-  if (settings.outline) {
-    ctx.strokeStyle = contrastInk(background);
-    ctx.lineWidth = ui / map.s;
-    ctx.stroke(path);
-  } else {
-    if (settings.fillOn) { ctx.fillStyle = settings.fill; ctx.fill(path, "evenodd"); }
-    if (settings.strokeWidth > 0) { ctx.strokeStyle = settings.stroke; ctx.lineWidth = settings.strokeWidth; ctx.stroke(path); }
-  }
+  const last = lastFrameStyle(settings);
+  const weight = last ? lastWeight : 0;
+  if (weight < 1) paint(ctx, path, baseStyle(settings), 1 - weight, background, ui / map.s);
+  if (last && weight > 0) paint(ctx, path, last, weight, background, ui / map.s);
   ctx.restore();
   if (includeOverlays) drawOverlays(ctx, shape, map, settings, ui);
+}
+
+function paint(ctx: CanvasRenderingContext2D, path: Path2D, style: PaintStyle, alpha: number, background: string, hairline: number) {
+  ctx.globalAlpha = alpha;
+  if (style.outline) {
+    ctx.strokeStyle = contrastInk(background);
+    ctx.lineWidth = hairline;
+    ctx.stroke(path);
+  } else {
+    if (style.fillOn) { ctx.fillStyle = style.fill; ctx.fill(path, "evenodd"); }
+    if (style.strokeWidth > 0) { ctx.strokeStyle = style.stroke; ctx.lineWidth = style.strokeWidth; ctx.stroke(path); }
+  }
+  ctx.globalAlpha = 1;
 }
 
 function drawOverlays(ctx: CanvasRenderingContext2D, shape: readonly Subpath[], map: StageMap, settings: MorphSettings, ui: number) {

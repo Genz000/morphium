@@ -2,7 +2,7 @@ import {
   defineToolcraft, imageExportModule, mediaSourceModule, timelineModule, videoExportModule,
 } from "@/toolcraft/runtime";
 
-import { backgroundControls, displayControls, fittingControls, frameControls, motionControls, shapeControls } from "../morph/morph-controls";
+import { backgroundControls, displayControls, fittingControls, frameControls, lastFrameControls, motionControls, shapeControls } from "../morph/morph-controls";
 import { defaultFrameAssets } from "../morph/morph-default-assets";
 import { REFERENCE_LOOP_SECONDS } from "../morph/morph-reference";
 import appDefaults from "./app-defaults.json" with { type: "json" };
@@ -28,6 +28,7 @@ export const appSchema = defineToolcraft({
           { id: "frame-fitting", title: "Fitting", controls: fittingControls },
           { id: "motion", title: "Motion", controls: motionControls },
           { id: "shape", title: "Shape", controls: shapeControls },
+          { id: "last-frame", title: "Last Frame", controls: lastFrameControls },
           { id: "display", title: "Display", controls: displayControls },
         ],
         title: "Controls",

@@ -4,7 +4,7 @@ import { drawMorphFrame } from "./morph-draw";
 import { cachedFrames, frameAssets, framesKey, normalizedFrames } from "./morph-frames";
 import { exportPass } from "./morph-pipeline";
 import { readMorphSettings } from "./morph-settings";
-import { shapeAtProgress, stageMap } from "./morph-scene";
+import { lastFrameWeight, shapeAtProgress, stageMap } from "./morph-scene";
 
 /**
  * Shared image/video frame. Uses the frames the live preview decoded (same
@@ -21,11 +21,11 @@ export const morphExport: ToolcraftProductExportRenderer = {
       if (!frames.length) return;
       const settings = readMorphSettings(state.values);
       const norm = normalizedFrames(frames, framesKey(assets), settings.fit);
-      const { shape } = shapeAtProgress(norm, timelineProgress, settings);
+      const { shape, phase } = shapeAtProgress(norm, timelineProgress, settings);
       const map = stageMap(frames[0].viewBox, frame);
       const ui = Math.min(frame.width, frame.height) / 600;
       const background = String(state.values["appearance.background"] ?? "#F4F1EA");
-      drawMorphFrame(context, shape, map, settings, background, ui, settings.overlayExport);
+      drawMorphFrame(context, shape, map, settings, background, ui, settings.overlayExport, lastFrameWeight(phase, norm.length));
       signal.throwIfAborted();
     };
     if (rendererPipeline) await rendererPipeline.runPass(exportPass, undefined, render);
