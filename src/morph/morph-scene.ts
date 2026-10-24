@@ -20,7 +20,8 @@ export function stageMap(viewBox: ViewBox, rect: Rect): StageMap {
 
 export function shapeAtProgress(norm: readonly Subpath[][], progress: number, settings: MorphSettings): { shape: readonly Subpath[]; phase: MorphPhase } {
   const ease = resolveEasing(settings.easing, settings.curve);
-  const phase = phaseAt(progress, norm.length, settings.sequence, settings.hold, ease);
+  const phase = phaseAt(progress, norm.length, settings.sequence, settings.hold, ease,
+    { delay: settings.delay, duration: settings.duration, lastHold: settings.lastHold });
   if (!norm.length) return { shape: [], phase };
   const shape = phase.raw === 0 ? norm[phase.a] : lerpShape(norm[phase.a], norm[phase.b], phase.p);
   return { shape, phase };

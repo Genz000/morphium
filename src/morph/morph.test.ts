@@ -15,7 +15,7 @@ import { DEMO_FRAMES } from "./morph-default-assets";
 import { parseSvgFrame } from "./morph-svg";
 import { lerpShape, normalizeFrames, subdivide } from "./morph-normalize";
 import { arcToCubics, parsePathData, pathToSubpaths } from "./morph-path";
-import { keyOrder, phaseAt } from "./morph-sequence";
+import { keyOrder, loopMs, phaseAt, stepHolds } from "./morph-sequence";
 import { FRAMES_TARGET, morphDefaults, readMorphSettings } from "./morph-settings";
 import { drawMorphFrame } from "./morph-draw";
 import { formatCoordinate, lastFrameWeight, overlayGeometry, shapeAtProgress, stageMap } from "./morph-scene";
@@ -26,6 +26,7 @@ import { demoFrames, drawSignature, FRAME, MID_MORPH, recordingContext } from ".
 const ON_LAST = 0.78;
 const changes: Record<string, { base?: Record<string, unknown>; value: unknown; progress?: number }> = {
   "lastFrame.on": { value: true, progress: ON_LAST },
+  "lastFrame.hold": { value: 3000 },
   "lastFrame.style": { base: { "lastFrame.on": true }, value: "outline", progress: ON_LAST },
   "lastFrame.fill": { base: { "lastFrame.on": true }, value: "#2F5BFF", progress: ON_LAST },
   "lastFrame.anchors": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
@@ -168,6 +169,30 @@ it("morph render plan has valid derived paths and fixtures", () => {
       expect(compileToolcraftPerformanceFixturePlan(appPerformance, path).dimensionIds).toEqual(path.workloadDimensions);
     }
   }
+});
+
+describe("last frame hold", () => {
+  const timing = { delay: 500, duration: 1200, lastHold: 3000 };
+  it("rests longer on the last frame and lengthens the loop", () => {
+    expect(loopMs(4, "loop", { ...timing, lastHold: 0 })).toBe(6800);
+    expect(loopMs(4, "loop", timing)).toBe(9800);
+    expect(stepHolds(4, "loop", timing)).toEqual([500, 500, 500, 3500]);
+    const ease = resolveEasing("linear", undefined);
+    // Last step starts at 5100 ms of 9800 and rests 3500 ms.
+    expect(phaseAt(5200 / 9800, 4, "loop", 0, ease, timing)).toMatchObject({ a: 3, holding: true });
+    expect(phaseAt(8500 / 9800, 4, "loop", 0, ease, timing)).toMatchObject({ a: 3, holding: true });
+    expect(phaseAt(9000 / 9800, 4, "loop", 0, ease, timing)).toMatchObject({ a: 3, b: 0, holding: false });
+    expect(phaseAt(0, 4, "loop", 0, ease, timing)).toMatchObject({ a: 0, holding: true });
+  });
+  it("matches the original timing when the extra hold is 0", () => {
+    const ease = resolveEasing("linear", undefined);
+    for (const p of [0.1, 0.3, 0.55, 0.78, 0.9]) {
+      expect(phaseAt(p, 4, "loop", 0, ease, { delay: 500, duration: 1200, lastHold: 0 }).a).toBe(phaseAt(p, 4, "loop", 500 / 17, ease).a);
+    }
+  });
+  it("holds the middle frame in ping-pong", () => {
+    expect(stepHolds(4, "pingpong", timing)).toEqual([500, 500, 500, 3500, 500, 500]);
+  });
 });
 
 describe("last frame style", () => {

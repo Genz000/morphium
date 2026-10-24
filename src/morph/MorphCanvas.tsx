@@ -10,7 +10,7 @@ import { decodeFrames, frameAssets, framesKey, isFrame, normalizedFrames, type F
 import { decodePass, normalizePass, scenePass } from "./morph-pipeline";
 import { MorphOverlays } from "./MorphOverlays";
 import { readMorphSettings } from "./morph-settings";
-import { keyOrder } from "./morph-sequence";
+import { loopMs } from "./morph-sequence";
 import { baseStyle, contrastInk, lastFrameStyle, lastFrameWeight, overlayOpacity, pathData, shapeAtProgress, stageMap, type PaintStyle } from "./morph-scene";
 import type { MorphFrame } from "./morph-types";
 import styles from "./morph.module.css";
@@ -43,8 +43,8 @@ export function MorphCanvas() {
 
   // Delay and Duration own the speed: keep the timeline one full loop long.
   const dispatch = useToolcraftDispatch();
-  const steps = Math.max(1, keyOrder(frames.length, settings.sequence).length - 1);
-  const loopSeconds = Math.min(60, Math.max(0.1, (steps * (settings.delay + settings.duration)) / 1000));
+  const timing = { delay: settings.delay, duration: settings.duration, lastHold: settings.lastHold };
+  const loopSeconds = Math.min(60, Math.max(0.1, loopMs(frames.length, settings.sequence, timing) / 1000));
   useEffect(() => {
     if (frames.length > 1 && Math.abs(loopSeconds - durationSeconds) > 0.001) {
       dispatch({ type: "timeline.setDuration", durationSeconds: loopSeconds } as never);

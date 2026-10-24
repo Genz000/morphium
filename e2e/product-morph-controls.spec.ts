@@ -126,6 +126,7 @@ const specs: Record<string, Spec> = {
     prepare: async (page) => { await setSlider(page, "shape.strokeWidth", 14); await pauseTimelineAt(page, 0.28); },
     prove: cycleSegment,
   },
+  "lastFrame.hold": { prove: slider([0.5, 0.1, 0.9]) },
   "lastFrame.on": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: toggle },
   "lastFrame.style": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: cycleSegment },
   "lastFrame.fill": { prepare: (page) => pauseTimelineAt(page, 0.78), prove: color(["#2F5BFF", "#22AA66", "#AA1144"]) },

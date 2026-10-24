@@ -130,6 +130,11 @@ export const displayControls = {
 } as const satisfies Record<string, ToolcraftControlSchema>;
 
 export const lastFrameControls = {
+  hold: {
+    ...live, type: "slider", target: "lastFrame.hold", label: "Last frame hold", defaultValue: d.lastHold,
+    min: 0, max: 10000, step: 100, unit: "ms", sliderValueKind: "continuous", editableRange: { hardMin: 0, hardMax: 60000 },
+    description: "Extra time the animation rests on the last frame, on top of Delay. The timeline gets longer to fit it.",
+  },
   on: {
     ...live, type: "switch", target: "lastFrame.on", label: "Style last frame", defaultValue: d.lastOn,
     description: "Gives the final frame its own look. It fades in as the shape morphs into the last frame and back out as the loop returns.",
