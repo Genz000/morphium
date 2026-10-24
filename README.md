@@ -8,7 +8,7 @@ Animate between SVG shapes. Upload up to five SVG frames and Morphium morphs one
 
 - Morphs between up to 5 uploaded SVG frames, in the order of the file list
 - Loop, ping-pong or once (ends on the last frame) sequence, delay and duration in ms, 20 easing presets or a custom curve
-- Outline view, fill and stroke colour, stroke width and line join
+- Scale of the artwork on the canvas (%), outline view, fill and stroke colour, stroke width and line join
 - A separate look for the last frame (solid fill or outline), with the option to hide its anchors and handles and to hold it longer (Last frame hold, in ms)
 - Anchors and bézier handles on or off, with x, y coordinates in the first frame's SVG units
 - Background colour, editable canvas size

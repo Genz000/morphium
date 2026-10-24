@@ -33,6 +33,11 @@ export const fittingControls = {
     performanceReason: "Re-normalises the decoded frames once; playback then reuses the result.",
     options: [{ label: "viewBox", value: "viewbox" }, { label: "Content", value: "content" }],
   },
+  scale: {
+    ...live, type: "slider", target: "frames.scale", label: "Scale", defaultValue: d.scale,
+    min: 10, max: 300, step: 1, unit: "%", sliderValueKind: "continuous", editableRange: { hardMin: 1, hardMax: 1000 },
+    description: "Size of the artwork on the canvas, around its centre. 100% fits the first frame to the canvas. Applies to the preview and every export.",
+  },
 } as const satisfies Record<string, ToolcraftControlSchema>;
 
 export const motionControls = {

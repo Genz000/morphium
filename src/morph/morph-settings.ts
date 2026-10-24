@@ -7,6 +7,7 @@ export const MAX_FRAMES = 5;
 /** Reference defaults from the original Morphium page. */
 export const morphDefaults = {
   fit: "viewbox" as FitMode,
+  scale: 100,
   sequence: "loop" as SequenceMode,
   delay: 500,
   duration: 1200,
@@ -38,7 +39,7 @@ export const morphDefaults = {
 };
 
 export type MorphSettings = {
-  fit: FitMode; sequence: SequenceMode; delay: number; duration: number; hold: number; easing: string; curve: CurveValue;
+  fit: FitMode; scale: number; sequence: SequenceMode; delay: number; duration: number; hold: number; easing: string; curve: CurveValue;
   outline: boolean; anchors: boolean; handles: boolean; labels: CoordinateLabels; decimals: number;
   labelSize: number; pointSize: number; anchorColor: string; handleColor: string; overlayExport: boolean; exportDots: boolean;
   fillOn: boolean; fill: string; stroke: string; strokeWidth: number; lineJoin: LineJoin;
@@ -52,6 +53,8 @@ export const overlayTargets = [
   "overlay.anchors", "overlay.handles", "overlay.labels", "overlay.decimals",
   "overlay.labelSize", "overlay.pointSize", "overlay.anchorColor", "overlay.handleColor", "overlay.export", "overlay.exportDots",
 ] as const;
+/** Placement on the canvas: changes the scene without re-normalising frames. */
+export const placementTargets = ["frames.scale"] as const;
 export const lastFrameTargets = ["lastFrame.hold", "lastFrame.on", "lastFrame.style", "lastFrame.fill", "lastFrame.anchors", "lastFrame.handles"] as const;
 export const shapeTargets = ["shape.outline", "shape.fillOn", "shape.fill", "shape.stroke", "shape.strokeWidth", "shape.lineJoin"] as const;
 
@@ -60,6 +63,7 @@ export function readMorphSettings(values: Readonly<Record<string, unknown>>): Mo
   const d = morphDefaults;
   return {
     fit: v("frames.fit", d.fit),
+    scale: v("frames.scale", d.scale),
     sequence: v("motion.sequence", d.sequence),
     delay: v("motion.delay", d.delay),
     duration: v("motion.duration", d.duration),

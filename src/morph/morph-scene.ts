@@ -9,13 +9,11 @@ export type Rect = { x: number; y: number; width: number; height: number };
 /** Maps frame-1 coordinates into the product rect: contained and centred, like the original stage. */
 export type StageMap = { s: number; ox: number; oy: number };
 
-export function stageMap(viewBox: ViewBox, rect: Rect): StageMap {
-  const s = Math.min(rect.width / viewBox[2], rect.height / viewBox[3]);
-  return {
-    s,
-    ox: rect.x + (rect.width - viewBox[2] * s) / 2 - viewBox[0] * s,
-    oy: rect.y + (rect.height - viewBox[3] * s) / 2 - viewBox[1] * s,
-  };
+/** `scale` (1 = fit) resizes the artwork around the centre of the product rect. */
+export function stageMap(viewBox: ViewBox, rect: Rect, scale = 1): StageMap {
+  const s = Math.min(rect.width / viewBox[2], rect.height / viewBox[3]) * (scale > 0 ? scale : 1);
+  const cx = viewBox[0] + viewBox[2] / 2, cy = viewBox[1] + viewBox[3] / 2;
+  return { s, ox: rect.x + rect.width / 2 - cx * s, oy: rect.y + rect.height / 2 - cy * s };
 }
 
 export function shapeAtProgress(norm: readonly Subpath[][], progress: number, settings: MorphSettings): { shape: readonly Subpath[]; phase: MorphPhase } {

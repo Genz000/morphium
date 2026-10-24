@@ -76,6 +76,7 @@ const slider = (fractions: readonly number[]) => async (ctx: Ctx) => {
 
 const specs: Record<string, Spec> = {
   "frames.fit": { prove: cycleSegment },
+  "frames.scale": { prove: slider([0.2, 0.8, 0.5]) },
   "motion.sequence": { prepare: (page) => pauseTimelineAt(page, 0.6), prove: cycleSegment },
   "motion.delay": { prove: slider([0.85, 0.1, 0.5]) },
   "motion.duration": { prove: slider([0.8, 0.1, 0.5]) },

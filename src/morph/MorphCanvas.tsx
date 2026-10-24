@@ -67,7 +67,7 @@ export function MorphCanvas() {
 
   if (!rect) return null;
   const local = { x: 0, y: 0, width: rect.width, height: rect.height };
-  const map = frames.length ? stageMap(frames[0].viewBox, local) : null;
+  const map = frames.length ? stageMap(frames[0].viewBox, local, settings.scale / 100) : null;
   const ui = Math.min(rect.width, rect.height) / 600;
   const d = pathData(shape);
   const last = lastFrameStyle(settings);

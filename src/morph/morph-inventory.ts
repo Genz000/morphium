@@ -23,7 +23,7 @@ export const morphSectionInventory = [
   {
     id: "frame-fitting", title: "Fitting", entityId: "frames", entity: "SVG frames", workflowStage: "fitting",
     splitReason: "How frames are aligned to each other is set after upload and resets independently of the file list.",
-    targets: ["frames.fit"], groupingReason: "Alignment of the uploaded frames into the first frame's coordinates.",
+    targets: ["frames.fit", "frames.scale"], groupingReason: "How the uploaded frames are aligned to each other and sized on the canvas.",
     finiteSelectors: [{ target: "frames.fit", role: "parameter", reason: "Changes how each frame is scaled into frame 1; no other control depends on it." }],
   },
   {
@@ -113,6 +113,7 @@ export const morphReadiness: ToolcraftProductReadiness = {
       alternative: { surface: "canvas", reason: "File list chrome on the canvas would cover the artwork." },
     },
     panelProperty("frames.fit", "The original sidebar had a viewBox/Content segmented control."),
+    panelProperty("frames.scale", "Requested by the user: a scale value in the panel to size the SVG on the canvas."),
     ...motionTargets.map((t) => panelProperty(t, "The original sidebar held sequence, hold and easing controls.")),
     ...shapeTargets.map((t) => panelProperty(t, "The original sidebar held outline, fill and stroke controls.")),
     ...lastFrameTargets.map((t) => panelProperty(t, "Requested by the user: outline on every frame, solid fill on the last one.")),

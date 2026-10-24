@@ -32,6 +32,7 @@ const changes: Record<string, { base?: Record<string, unknown>; value: unknown; 
   "lastFrame.anchors": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
   "lastFrame.handles": { base: { "lastFrame.on": true }, value: false, progress: ON_LAST },
   "frames.fit": { value: "content" },
+  "frames.scale": { value: 150 },
   "motion.sequence": { value: "pingpong" },
   "motion.delay": { value: 1500 },
   "motion.duration": { value: 400 },
@@ -154,6 +155,11 @@ const contractTests: Record<string, () => void | Promise<void>> = {
   "canvas.size": () => {
     expect(drawSignature({}, { frame: { x: -640, y: -360, width: 1280, height: 720 } })).not.toBe(drawSignature({}));
     expect(stageMap([0, 0, 400, 400], FRAME).s).toBe(1080 / 400);
+    // Scale resizes around the centre: the viewBox centre stays at the rect centre.
+    const half = stageMap([0, 0, 400, 400], FRAME, 0.5);
+    expect(half.s).toBe(1080 / 800);
+    expect(200 * half.s + half.ox).toBe(FRAME.x + FRAME.width / 2);
+    expect(200 * half.s + half.oy).toBe(FRAME.y + FRAME.height / 2);
   },
   "canvas.infinity": () => {
     const state = createToolcraftState(appSchema);

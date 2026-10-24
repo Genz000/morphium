@@ -1,6 +1,6 @@
 import { registerToolcraftRendererPipeline, type ToolcraftRendererPipelinePassContract } from "@/toolcraft/runtime";
 
-import { geometryTargets, lastFrameTargets, motionTargets, overlayTargets, shapeTargets } from "./morph-settings";
+import { geometryTargets, lastFrameTargets, motionTargets, overlayTargets, placementTargets, shapeTargets } from "./morph-settings";
 import type { FrameEntry } from "./morph-frames";
 import type { Subpath } from "./morph-types";
 
@@ -11,7 +11,7 @@ const STAGE = {
 
 const canvasTargets = ["canvas.size.width", "canvas.size.height"];
 const timelineTargets = ["timeline.currentTimeSeconds", "timeline.durationSeconds"];
-const sceneInputs = [...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets, ...timelineTargets];
+const sceneInputs = [...placementTargets, ...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets, ...timelineTargets];
 
 export const morphPipeline = registerToolcraftRendererPipeline<{
   decode: ToolcraftRendererPipelinePassContract<readonly FrameEntry[]>;
@@ -54,12 +54,12 @@ export const morphPipeline = registerToolcraftRendererPipeline<{
     { interaction: "timeline-scrub", targets: ["timeline"], invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"] },
     {
       interaction: "control-drag",
-      targets: ["motion.delay", "motion.duration", "lastFrame.hold", "overlay.labelSize", "overlay.pointSize", "shape.strokeWidth"],
+      targets: ["frames.scale", "motion.delay", "motion.duration", "lastFrame.hold", "overlay.labelSize", "overlay.pointSize", "shape.strokeWidth"],
       invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"],
     },
     {
       interaction: "control-change",
-      targets: [...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets],
+      targets: [...placementTargets, ...motionTargets, ...shapeTargets, ...lastFrameTargets, ...overlayTargets, ...canvasTargets],
       invalidates: ["scene"], mustNotInvalidate: ["decode", "normalize"],
     },
     {
